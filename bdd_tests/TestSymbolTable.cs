@@ -39,5 +39,16 @@ namespace bdd_tests
             }
         }
 
+        [TestMethod]
+        public void TestAddingMultipleSymbolsIsOK()
+        {
+            var st = new SymbolTable();
+            var aid = st.DeclareVariable("a");
+            var bid = st.DeclareVariable("b");
+            aid.Should().NotBe(bid);
+            st.GetSymbolId("a").Should().HaveValue();
+            st.GetSymbolId("b").Should().HaveValue();
+        }
+
     }
 }
