@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.25428.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "bdd_th", "bdd_th\bdd_th.csproj", "{2D223F2B-EB0E-4021-9B95-C2E99D19021E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "bdd", "bdd\bdd.csproj", "{273B57B6-0448-4D43-87FA-6612DD9D367F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "bdd_tests", "bdd_tests\bdd_tests.csproj", "{0B6A3BB7-2A25-457F-A6AF-E0064261ACC8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2D223F2B-EB0E-4021-9B95-C2E99D19021E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2D223F2B-EB0E-4021-9B95-C2E99D19021E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2D223F2B-EB0E-4021-9B95-C2E99D19021E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2D223F2B-EB0E-4021-9B95-C2E99D19021E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{273B57B6-0448-4D43-87FA-6612DD9D367F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{273B57B6-0448-4D43-87FA-6612DD9D367F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{273B57B6-0448-4D43-87FA-6612DD9D367F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{273B57B6-0448-4D43-87FA-6612DD9D367F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0B6A3BB7-2A25-457F-A6AF-E0064261ACC8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0B6A3BB7-2A25-457F-A6AF-E0064261ACC8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0B6A3BB7-2A25-457F-A6AF-E0064261ACC8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0B6A3BB7-2A25-457F-A6AF-E0064261ACC8}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
