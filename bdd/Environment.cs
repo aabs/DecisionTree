@@ -10,6 +10,10 @@ namespace bdd
     {
         public Environment(Dictionary<string, int> args)
         {
+            if (args == null)
+            {
+                throw new ArgumentNullException(nameof(args));
+            }
             this.SymbolTable = new SymbolTable();
             this.ParentEnvironment = null;
             foreach (var nvp in args)
@@ -19,6 +23,10 @@ namespace bdd
         }
         public Environment(SymbolTable st, Environment parent = null, bool singleAssignment = false)
         {
+            if (st == null)
+            {
+                throw new ArgumentNullException(nameof(st));
+            }
             this.SymbolTable = st;
             this.ParentEnvironment = parent;
             this.SingleAssignment = singleAssignment;

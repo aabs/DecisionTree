@@ -6,7 +6,7 @@ using System.Collections.Generic;
 namespace bdd_tests
 {
     [TestClass]
-    public class node_tests
+    public class TestDecisionTree
     {
         [TestMethod]
         public void CanCreateNode()
@@ -15,10 +15,10 @@ namespace bdd_tests
             sut.Should().NotBeNull();
         }
         [TestMethod]
-        public void CanCreateDecisionTree()
+        [ExpectedException(typeof(System.ArgumentNullException))]
+        public void CannotCreateDTWithNullArgs()
         {
             var sut = new DecisionTree(null);
-            sut.Should().NotBeNull();
         }
         [TestMethod]
         public void CanCreateNodeInDecisionTree()
@@ -60,8 +60,13 @@ namespace bdd_tests
             }
         }
 
-        public void CheckEvaluationCases(DecisionTree dt, Dictionary<string, int> args, int expectation)
+        [TestMethod]
+        public void EvaluateBaseCase()
         {
+            var env = new Environment(new Dictionary<string, int> { { "a", 0 } });
+            var sut = new DecisionTree(env);
+            var rootNode = sut.CreateNode(  "a", 0, 1);
+            sut.Evaluate(rootNode.Id).Should().Be(0);
         }
     }
 }
