@@ -65,7 +65,32 @@ namespace bdd_tests
         {
             var env = new Environment(new Dictionary<string, int> { { "a", 0 } });
             var sut = new DecisionTree(env);
-            var rootNode = sut.CreateNode(  "a", 0, 1);
+            var rootNode = sut.CreateNode("a", 0, 1);
+            sut.Evaluate(rootNode.Id).Should().Be(0);
+        }
+
+        [TestMethod]
+        public void EvaluateTwoLevelCase()
+        {
+            var env = new Environment(new Dictionary<string, int> { { "a", 0 }, { "b", 1 } });
+            var sut = new DecisionTree(env);
+            var rootNode = sut.CreateNode("a",
+                sut.CreateNode("b", 0, 1),
+                sut.CreateNode("b", 1, 1));
+            sut.Evaluate(rootNode.Id).Should().Be(1);
+        }
+
+        [TestMethod]
+        public void EvaluateThreeLevelCase()
+        {
+            var env = new Environment(new Dictionary<string, int> { { "a", 1 }, { "b", 1 }, { "c", 1 } });
+            var sut = new DecisionTree(env);
+            var rootNode = sut.CreateNode(
+                "a",
+                sut.CreateNode("b", 0, 1),
+                sut.CreateNode("b",
+                    sut.CreateNode("c", 0, 1),
+                    sut.CreateNode("c", 1, 0)));
             sut.Evaluate(rootNode.Id).Should().Be(0);
         }
     }
