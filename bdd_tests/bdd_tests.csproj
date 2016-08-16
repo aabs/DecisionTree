@@ -60,6 +60,8 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="node_tests.cs" />
+    <Compile Include="TestEnvironment.cs" />
     <Compile Include="TestSymbolTable.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -29,7 +29,9 @@ namespace bdd
             }
             else
             {
-                return null;
+                // the first time we see a symbole, we register it and return an ID
+                var result = DeclareVariable(name);
+                return result;
             }
         }
     }

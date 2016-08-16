@@ -18,8 +18,7 @@ namespace bdd_tests
         [TestMethod]
         public void TestCanAddSymbolToTable() {
             var st = new SymbolTable();
-            st.GetSymbolId("a").Should().NotHaveValue();
-            st.DeclareVariable("a");
+            // symbols are declared on first mention...
             st.GetSymbolId("a").Should().HaveValue();
         }
 
