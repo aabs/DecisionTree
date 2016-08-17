@@ -7,21 +7,21 @@ using System.Text;
 
 namespace bdd
 {
-    public struct Node
+    public struct BranchNode
     {
-        public Node(int id, int symbolId, int fail, int pass)
+        public BranchNode(int id, int symbolId, int fail, int pass)
         {
             values = new int[4] { id, fail, pass, symbolId };
         }
-        public Node(int id, int symbolId, Node fail, Node pass)
+        public BranchNode(int id, int symbolId, BranchNode fail, BranchNode pass)
         {
             values = new int[4] { id, fail.Id, pass.Id, symbolId };
         }
-        public Node(int id, int symbolId, int fail, Node pass)
+        public BranchNode(int id, int symbolId, int fail, BranchNode pass)
         {
             values = new int[4] { id, fail, pass.Id, symbolId};
         }
-        public Node(int id, int symbolId, Node fail, int pass)
+        public BranchNode(int id, int symbolId, BranchNode fail, int pass)
         {
             values = new int[4] { id, fail.Id, pass, symbolId };
         }
@@ -37,7 +37,7 @@ namespace bdd
                 values[0] = value;
             }
         }
-        public int Fail
+        public int Lo
         {
             get
             {
@@ -48,7 +48,7 @@ namespace bdd
                 values[1] = value;
             }
         }
-        public int Pass
+        public int Hi
         {
             get
             {

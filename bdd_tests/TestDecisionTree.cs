@@ -11,7 +11,7 @@ namespace bdd_tests
         [TestMethod]
         public void CanCreateNode()
         {
-            var sut = new Node(1, 2, 3, 1);
+            var sut = new BranchNode(1, 2, 3, 1);
             sut.Should().NotBeNull();
         }
         [TestMethod]
@@ -50,13 +50,13 @@ namespace bdd_tests
         {
             var root = dt.GetNode(rootId);
             root.Should().NotBeNull();
-            if (root.Value.Pass > 1)
+            if (root.Value.Hi > 1)
             {
-                CheckNode(dt, root.Value.Pass);
+                CheckNode(dt, root.Value.Hi);
             }
-            if (root.Value.Fail > 1)
+            if (root.Value.Lo > 1)
             {
-                CheckNode(dt, root.Value.Fail);
+                CheckNode(dt, root.Value.Lo);
             }
         }
 

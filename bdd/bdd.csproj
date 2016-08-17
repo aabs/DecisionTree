@@ -42,7 +42,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DecisionTree.cs" />
-    <Compile Include="Node.cs" />
+    <Compile Include="DecisionTreeOptimiser.cs" />
+    <Compile Include="BranchNode.cs" />
     <Compile Include="Environment.cs" />
     <Compile Include="Exceptions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
