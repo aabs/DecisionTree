@@ -8,8 +8,9 @@ namespace bdd
 {
     public class DecisionTree
     {
-        static int nextNodeId = 2;
+        int nextNodeId = 2;
         int rootIndex;
+        Dictionary<int, BranchNode> nodes = new Dictionary<int, BranchNode>();
 
         public int RootIndex
         {
@@ -32,24 +33,6 @@ namespace bdd
             }
         }
 
-        private static void Assert(bool exp, string failureMessage = "assertion failed")
-        {
-            if (!exp)
-            {
-                throw new Exception(failureMessage);
-            }
-        }
-
-        public DecisionTree(Environment env)
-        {
-            if (env == null)
-            {
-                throw new ArgumentNullException(nameof(env));
-            }
-            this.Environment = env;
-        }
-        Dictionary<int, BranchNode> nodes = new Dictionary<int, BranchNode>();
-
         public Environment Environment { get; private set; }
 
         public Dictionary<int, BranchNode> Nodes
@@ -63,6 +46,35 @@ namespace bdd
             {
                 nodes = value;
             }
+        }
+
+        private static void Assert(bool exp, string failureMessage = "assertion failed")
+        {
+            if (!exp)
+            {
+                throw new Exception(failureMessage);
+            }
+        }
+
+        public DecisionTree(DecisionTree dt)
+        {
+            // copy across references to the environment, but duplicate everything else
+            this.Environment = dt.Environment;
+            foreach (var node in dt.Nodes.Values)
+            {
+                Nodes[node.Id] = new BranchNode(node);
+            }
+            RootIndex = dt.RootIndex;
+            nextNodeId = dt.GetNextNodeId();
+        }
+
+        public DecisionTree(Environment env)
+        {
+            if (env == null)
+            {
+                throw new ArgumentNullException(nameof(env));
+            }
+            this.Environment = env;
         }
 
         static void TestVariableNameValidity(string v)
@@ -124,6 +136,11 @@ namespace bdd
             var id = GetNextNodeId();
             Nodes[id] = new BranchNode(id, symbolId, fail, pass);
             return Nodes[id];
+        }
+
+        private void AddDuplicateNode(BranchNode n)
+        {
+            Nodes[n.Id] = new BranchNode(n);
         }
 
         public int GetNextNodeId()

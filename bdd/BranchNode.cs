@@ -9,6 +9,9 @@ namespace bdd
 {
     public struct BranchNode
     {
+        public BranchNode(BranchNode n) : this(n.Id, n.SymbolId, n.Lo, n.Hi)
+        {
+        }
         public BranchNode(int id, int symbolId, int fail, int pass)
         {
             values = new int[4] { id, fail, pass, symbolId };

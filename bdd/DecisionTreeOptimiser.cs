@@ -19,7 +19,8 @@ namespace bdd
         /// <returns>optimised version of the tree passed in</returns>
         public static DecisionTree Reduce(DecisionTree dtIn)
         {
-            var nodes = dtIn.Nodes.Values;
+            var result = new DecisionTree(dtIn);
+            var nodes = result.Nodes.Values;
             var changesMade = true;
             while (changesMade)
             {
@@ -27,11 +28,11 @@ namespace bdd
                 var redundantNodes = nodes.Where(n => n.Lo == n.Hi).ToList();
                 foreach (var rbn in redundantNodes)
                 {
-                    RemoveNode(dtIn, rbn);
+                    RemoveNode(result, rbn);
                     changesMade = true;
                 }
             }
-            return dtIn;
+            return result;
         }
 
         private static void RemoveNode(DecisionTree dtIn, BranchNode rbn)

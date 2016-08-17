@@ -18,7 +18,7 @@ namespace bdd_tests
         [ExpectedException(typeof(System.ArgumentNullException))]
         public void CannotCreateDTWithNullArgs()
         {
-            var sut = new DecisionTree(null);
+            var sut = new DecisionTree((Environment)null);
         }
         [TestMethod]
         public void CanCreateNodeInDecisionTree()

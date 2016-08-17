@@ -20,6 +20,8 @@ namespace bdd_tests
             sut.Nodes.Count.Should().Be(2);
             var sut2 = DecisionTreeOptimiser.Reduce(sut);
             sut2.Nodes.Count.Should().Be(1);
+            sut.Nodes.Count.Should().Be(2);
+            sut.Should().NotBe(sut2);
         }
     }
 }
