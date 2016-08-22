@@ -54,14 +54,22 @@ namespace bdd
 
         public int? Resolve(string variableName)
         {
-            int id = SymbolTable.GetSymbolId(variableName) ?? SymbolTable.DeclareVariable(variableName);
-            return Resolve(id);
+            var id = SymbolTable.GetSymbolId(variableName);
+            if (id.HasValue)
+            {
+                return Resolve(id.Value);
+            }
+            throw new DecisionException("Unresolved symbol name");
         }
 
         public void Bind(string variableName, int value)
         {
-            int id = SymbolTable.GetSymbolId(variableName) ?? SymbolTable.DeclareVariable(variableName);
-            Bind(id, value);
+            var id = SymbolTable.GetSymbolId(variableName);
+            if (!id.HasValue)
+            {
+                throw new DecisionException("Unresolved symbol name");
+            }
+            Bind(id.Value, value);
         }
 
         public void Bind(int variableId, int value)

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.25428.1
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "bdd_th", "bdd_th\bdd_th.csproj", "{2D223F2B-EB0E-4021-9B95-C2E99D19021E}"
 EndProject
@@ -12,6 +12,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0D038440-7FC8-4E74-AD28-C0A0E09EFEF5}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
+		testdata\problem-metadata.xml = testdata\problem-metadata.xml
+		testdata\usm.mbrmatch.trainingdata.csv = testdata\usm.mbrmatch.trainingdata.csv
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "bdd.Tests", "bdd.Tests\bdd.Tests.csproj", "{8BB0152C-EFF3-4899-831D-ACC115CB4030}"

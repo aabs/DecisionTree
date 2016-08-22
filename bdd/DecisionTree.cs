@@ -8,64 +8,15 @@ namespace bdd
 {
     public class DecisionTree
     {
-        int nextNodeId = 2;
-        int rootIndex;
-        Dictionary<int, BranchNode> nodes = new Dictionary<int, BranchNode>();
-
-        public int RootIndex
-        {
-            get
-            {
-                return rootIndex;
-            }
-
-            set
-            {
-                if (IsTerminal(value))
-                {
-                    throw new ArgumentOutOfRangeException("cannot set root node ID to be a result type");
-                }
-                if (!Nodes.ContainsKey(value))
-                {
-                    throw new ArgumentOutOfRangeException("missing node");
-                }
-                rootIndex = value;
-            }
-        }
+        public Node TreeRoot { get; set; }
 
         public Environment Environment { get; private set; }
-
-        public Dictionary<int, BranchNode> Nodes
-        {
-            get
-            {
-                return nodes;
-            }
-
-            set
-            {
-                nodes = value;
-            }
-        }
-
-        private static void Assert(bool exp, string failureMessage = "assertion failed")
-        {
-            if (!exp)
-            {
-                throw new Exception(failureMessage);
-            }
-        }
 
         public DecisionTree(DecisionTree dt)
         {
             // copy across references to the environment, but duplicate everything else
             this.Environment = dt.Environment;
-            foreach (var node in dt.Nodes.Values)
-            {
-                Nodes[node.Id] = new BranchNode(node);
-            }
-            RootIndex = dt.RootIndex;
-            nextNodeId = dt.GetNextNodeId();
+            TreeRoot = dt.TreeRoot;
         }
 
         public DecisionTree(Environment env)
@@ -89,7 +40,8 @@ namespace bdd
             }
         }
 
-        public BranchNode CreateNode(string v)
+/*
+ *        public BranchNode_OLD CreateNode(string v)
         {
             TestVariableNameValidity(v);
             var symbolId = Environment.SymbolTable.GetSymbolId(v).Value;
@@ -98,85 +50,60 @@ namespace bdd
                 throw new DecisionException("node already exists");
             }
             var id = GetNextNodeId();
-            Nodes[id] = new BranchNode(id, symbolId, 0, 1);
+            Nodes[id] = new BranchNode_OLD(id, symbolId, 0, 1);
             return Nodes[id];
         }
 
-        public BranchNode CreateNode(string v, BranchNode fail, BranchNode pass)
+        public BranchNode_OLD CreateNode(string v, BranchNode_OLD fail, BranchNode_OLD pass)
         {
             TestVariableNameValidity(v);
             var symbolId = Environment.SymbolTable.GetSymbolId(v).Value;
             var id = nextNodeId++;
-            Nodes[id] = new BranchNode(id, symbolId, fail.Id, pass.Id);
+            Nodes[id] = new BranchNode_OLD(id, symbolId, fail.Id, pass.Id);
             return Nodes[id];
         }
 
-        public BranchNode CreateNode(string v, int fail, BranchNode pass)
+        public BranchNode_OLD CreateNode(string v, int fail, BranchNode_OLD pass)
         {
             TestVariableNameValidity(v);
             var symbolId = Environment.SymbolTable.GetSymbolId(v).Value;
             var id = GetNextNodeId();
-            Nodes[id] = new BranchNode(id, symbolId, fail, pass.Id);
+            Nodes[id] = new BranchNode_OLD(id, symbolId, fail, pass.Id);
             return Nodes[id];
         }
 
-        public BranchNode CreateNode(string v, BranchNode fail, int pass)
+        public BranchNode_OLD CreateNode(string v, BranchNode_OLD fail, int pass)
         {
             TestVariableNameValidity(v);
             var symbolId = Environment.SymbolTable.GetSymbolId(v).Value;
             var id = GetNextNodeId();
-            Nodes[id] = new BranchNode(id, symbolId, fail.Id, pass);
+            Nodes[id] = new BranchNode_OLD(id, symbolId, fail.Id, pass);
             return Nodes[id];
         }
 
-        public BranchNode CreateNode(string v, int fail, int pass)
+        public BranchNode_OLD CreateNode(string v, int fail, int pass)
         {
             TestVariableNameValidity(v);
             var symbolId = Environment.SymbolTable.GetSymbolId(v).Value;
             var id = GetNextNodeId();
-            Nodes[id] = new BranchNode(id, symbolId, fail, pass);
+            Nodes[id] = new BranchNode_OLD(id, symbolId, fail, pass);
             return Nodes[id];
         }
+        */
 
-        private void AddDuplicateNode(BranchNode n)
+        public int Evaluate(Node node)
         {
-            Nodes[n.Id] = new BranchNode(n);
-        }
+            throw new NotImplementedException();
+            //var variableValue = Environment.Resolve(node.SymbolId).Value;
+            //var path = variableValue == 0 ? node.Lo : node.Hi;
 
-        public int GetNextNodeId()
-        {
-            return nextNodeId++;
-        }
-
-        public BranchNode? GetNode(int v)
-        {
-            if (Nodes.ContainsKey(v))
-                return Nodes[v];
-            return null;
-        }
-
-        public int Evaluate(int nodeIndex)
-        {
-            if (Nodes.Count == 0)
-            {
-                throw new ApplicationException("cannot create an evaluator for an empty decision tree");
-            }
-            var n = GetNode(nodeIndex);
-            if (!n.HasValue)
-            {
-                throw new ApplicationException("cannot create an evaluator for an empty decision tree");
-            }
-            var node = n.Value;
-            var variableValue = Environment.Resolve(node.SymbolId).Value;
-            var path = variableValue == 0 ? node.Lo : node.Hi;
-
-            if (IsTerminal(path)) return path;
-            return Evaluate(path);
+            //if (IsTerminal(path)) return path;
+            //return Evaluate(path);
         }
 
         public int Evaluate()
         {
-            return Evaluate(RootIndex);
+            return Evaluate(TreeRoot);
         }
 
         bool Pass(int p)

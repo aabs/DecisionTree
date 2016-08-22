@@ -26,10 +26,10 @@ namespace bdd_tests
         public void TesAddingKnownSymbolToTableCausesException()
         {
             var st = new SymbolTable();
-            st.DeclareVariable("a");
+            st.DeclareMaybeBooleanVariable("a");
             try
             {
-                st.DeclareVariable("a");
+                st.DeclareMaybeBooleanVariable("a");
                 Assert.Fail("should have resulted in an exception");
             }
             catch (DecisionException)
@@ -42,8 +42,8 @@ namespace bdd_tests
         public void TestAddingMultipleSymbolsIsOK()
         {
             var st = new SymbolTable();
-            var aid = st.DeclareVariable("a");
-            var bid = st.DeclareVariable("b");
+            var aid = st.DeclareMaybeBooleanVariable("a");
+            var bid = st.DeclareMaybeBooleanVariable("b");
             aid.Should().NotBe(bid);
             st.GetSymbolId("a").Should().HaveValue();
             st.GetSymbolId("b").Should().HaveValue();
