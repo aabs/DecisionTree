@@ -87,9 +87,31 @@ namespace bdd
             return newEntry.Id;
         }
 
+        internal int DeclareEnumeratedVariable(string variableName, Dictionary<string, int> vals)
+        {
+            if (symbols.ContainsKey(variableName))
+            {
+                throw new DecisionException("symbol already in use");
+            }
+            var newEntry = new SymbolTableEntry
+            {
+                Id = nextId++,
+                Name = variableName,
+                AttributeType = typeof(int),
+                Classifications = vals.Select(p => new AttributeClassicationInstance { ClassName =p.Key, Value = p.Value }).ToList()
+            };
+            symbols[newEntry.Name] = newEntry;
+            return newEntry.Id;
+        }
+
         public int? GetSymbolId(string name)
         {
-            return symbols[name]?.Id;
+            return GetEntry(name).Id;
+        }
+
+        public SymbolTableEntry GetEntry(string name)
+        {
+            return symbols[name];
         }
     }
 }

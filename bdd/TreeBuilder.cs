@@ -27,8 +27,26 @@ namespace bdd
                 SampleDataLocation = root.Element("SampleData").Value,
                 Outcomes = LoadOutcomes(root),
                 Attributes = LoadAttributes(root)
-
             };
+            result.SymbolTable = BuildSymbolTable(result);
+            return result;
+        }
+
+        private SymbolTable BuildSymbolTable(Decision d)
+        {
+            var result = new SymbolTable();
+            foreach (var attr in d.Attributes)
+            {
+                switch (attr.DataType)
+                {
+                    case "Enumerated":
+                        var vals = attr.Classes.ToDictionary(c => c.Name, c => c.Id);
+                        result.DeclareEnumeratedVariable(attr.Name, vals);
+                        break;
+                    default:
+                        break;
+                }
+            }
             return result;
         }
 
@@ -71,15 +89,76 @@ namespace bdd
             String csvString = File.ReadAllText(Config.SampleDataLocation);
             String[][] data = CsvParser.Parse(csvString);
             var samples = ConvertSampleDataToDataSet(data);
-
-            Dictionary<DecisionSpaceAttribute, double> IGs = new Dictionary<DecisionSpaceAttribute, double>();
-            var x = samples.Tables["Samples"].AsEnumerable();
-            foreach (var attr in Config.Attributes)
-            {
-                IGs[attr] = AverageEntropy(x, attr);
-            }
+            var root = CreateTree(samples.Tables["Samples"].AsEnumerable(),
+                Config.Attributes);
 
             throw new NotImplementedException();
+        }
+
+        public Node CreateTree(IEnumerable<DataRow> examples,
+            IEnumerable<DecisionSpaceAttribute> attributes)
+        {
+            // 0. if all samples have same outcome create terminal node with that outcome
+            foreach (var o in Config.Outcomes.Values)
+            {
+                if (AllSamplesHaveSameOutcome(examples, o))
+                {
+                    return new TerminalNode { Result = o.Name };
+                }
+            }
+            // if we get to here, data must be variegated...
+
+            // 1. find the best attribute to classify sample data
+            var attr = GetDominatingAttribute(examples, attributes);
+            var result = new BranchNode(GetSymbolTableEntryFromAttribute(attr), null);
+            // 2. for each class under that attribute
+            foreach (DataClass cls in attr.Classes)
+            {
+                // 2.1. if samples contain instances with that value of the attribute,
+                if (SamplesContainInstanceWithAttributeInClass(examples, attr, cls))
+                {
+                    // 2.1.1 then create a node for that outcome
+                    //       with the list filtered to that outcome
+                    var filteredExamples = FilterExamplesToSubclassOfAttribute(examples, attr, cls);
+                    //       with the attribute list filtered to remove the attribute
+                    var filteredAttributes = attributes.Except(new[] { attr });
+                    var branchClass = new AttributeClassicationInstance { ClassName = cls.Name, Value = cls.Name };
+                    result.Branches[branchClass] = CreateTree(filteredExamples, filteredAttributes);
+                }
+            }
+            return result;
+        }
+
+        private IEnumerable<DataRow> FilterExamplesToSubclassOfAttribute(IEnumerable<DataRow> examples, DecisionSpaceAttribute attr, DataClass cls)
+        {
+            var col = ConvertAttributeNameToColumnName(attr.Name);
+            return examples.Where(e => e.Field<string>(col) == cls.Name);
+        }
+
+        private SymbolTableEntry GetSymbolTableEntryFromAttribute(DecisionSpaceAttribute attr)
+        {
+            return Config.SymbolTable.GetEntry(attr.Name);
+        }
+
+        private bool SamplesContainInstanceWithAttributeInClass(IEnumerable<DataRow> examples, DecisionSpaceAttribute attr, DataClass cls)
+        {
+            var col = ConvertAttributeNameToColumnName(attr.Name);
+            return examples.Any(dr => dr.Field<string>(col) == cls.Name);
+        }
+
+        DecisionSpaceAttribute GetDominatingAttribute(IEnumerable<DataRow> examples,
+            IEnumerable<DecisionSpaceAttribute> attributes)
+        {
+            Dictionary<DecisionSpaceAttribute, double> IGs = new Dictionary<DecisionSpaceAttribute, double>();
+            foreach (var attr in Config.Attributes)
+            {
+                IGs[attr] = AverageEntropy(examples, attr);
+            }
+
+            // take the absolute value of the scores, order them ascending and take the first (i.e. lowest (lowest entropy, that is))
+            return IGs.Select(kvp => new { kvp.Key, Value = Math.Abs(kvp.Value) })
+                .OrderBy(kvp => kvp.Value)
+                .FirstOrDefault().Key;
         }
 
         /// <summary>
@@ -151,9 +230,9 @@ namespace bdd
             return -1 * sum;
         }
 
-        bool AllSamplesHaveSameOutcome(DataSet ds, Outcome outcome)
+        bool AllSamplesHaveSameOutcome(IEnumerable<DataRow> samples, Outcome outcome)
         {
-            return Enumerable.All(ds.Tables["Samples"].AsEnumerable(),
+            return Enumerable.All(samples,
                 dr => dr.Field<string>("DecisionOutcome") == outcome.Name);
         }
 
