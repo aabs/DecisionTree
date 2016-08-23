@@ -45,6 +45,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Collections.cs" />
     <Compile Include="DecisionTree.cs" />
     <Compile Include="DecisionTreeOptimiser.cs" />
     <Compile Include="BranchNode.cs" />
