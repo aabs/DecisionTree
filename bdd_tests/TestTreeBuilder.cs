@@ -2,13 +2,7 @@
 using bdd;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Xml.Linq;
 
 namespace bdd_tests
 {
