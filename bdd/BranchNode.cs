@@ -13,6 +13,12 @@ namespace bdd
         public Node Parent { get; set; }
 
         public abstract bool IsRedundant();
+        public string PrettyPrint()
+        {
+            return PrettyPrint(0);
+        }
+        public abstract string PrettyPrint(int indentLevel);
+
     }
 
     public class TerminalNode : Node
@@ -22,6 +28,17 @@ namespace bdd
         public override bool IsRedundant()
         {
             return false;
+        }
+
+        public override string PrettyPrint(int indentLevel)
+        {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < indentLevel; i++)
+            {
+                sb.Append("  ");
+            }
+            sb.Append($"T: {Result}\n");
+            return sb.ToString();
         }
     }
 
@@ -67,6 +84,24 @@ namespace bdd
             var first = branches.Values.First();
             return Enumerable.All(branches.Values.Skip(1), x => x.Equals(first));
         }
+
+        public override string PrettyPrint(int indentLevel)
+        {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < indentLevel; i++)
+            {
+                sb.Append("  ");
+            }
+
+            sb.Append($"B: {Symbol.Name}\n");
+            foreach (var b in branches)
+            {
+                var lbl = $"[{b.Key.ClassName}] -> {b.Value.PrettyPrint(++indentLevel)}";
+                sb.Append(lbl);
+            }
+            return sb.ToString();
+        }
+
     }
     public struct BranchNode_OLD
     {

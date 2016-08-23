@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,6 +13,7 @@ namespace bdd
         public string SampleDataLocation { get; set; }
         public Outcomes Outcomes { get; set; }
         public List<DecisionSpaceAttribute> Attributes { get; set; }
+        public IEnumerable<DataRow> AllSamples { get; set; }
     }
 
     public class DecisionSpaceAttribute

@@ -1,6 +1,14 @@
-﻿using bdd;
+﻿
+using bdd;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Xml.Linq;
 
 namespace bdd_tests
 {
@@ -21,6 +29,30 @@ namespace bdd_tests
         {
             var sut = new TreeBuilder(testDataCsvFile);
             DecisionTree dt = sut.CreateTree();
+        }
+
+        [TestMethod]
+        public void CanEvaluateTree()
+        {
+            var sut = new TreeBuilder(testDataCsvFile);
+            DecisionTree dt = sut.CreateTree();
+
+            foreach (DataRow row in sut.Config.AllSamples)
+            {
+                dt.Environment = RowToEnv(sut.Config, row);
+                row.Field<string>("DecisionOutcome").Should().Be(dt.Evaluate());
+            }
+        }
+
+        private bdd.Environment RowToEnv(Decision config, DataRow row)
+        {
+            var env = new bdd.Environment(config.SymbolTable);
+            foreach (var attr in config.Attributes)
+            {
+                var colName = UtilityFunctions.ConvertAttributeNameToColumnName(attr.Name);
+                env.Bind(attr.Name, row.Field<string>(colName));
+            }
+            return env;
         }
     }
 }

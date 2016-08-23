@@ -20,8 +20,8 @@ namespace bdd_tests
         {
             var st = new SymbolTable();
             var sut = new Environment(st);
-            sut.Bind("a", 2);
-            sut.Resolve("a").Should().HaveValue();
+            sut.Bind("a", "2");
+            sut.Resolve("a").Should().NotBeNull();
         }
 
     }

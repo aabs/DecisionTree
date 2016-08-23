@@ -26,7 +26,7 @@
       <Classes>
         <Class>
           <Id>1</Id>
-          <Name>Missing</Name>
+          <Name>Not supplied</Name>
         </Class>
         <Class>
           <Id>2</Id>
@@ -44,7 +44,7 @@
       <Classes>
         <Class>
           <Id>1</Id>
-          <Name>Missing</Name>
+          <Name>Not supplied</Name>
         </Class>
         <Class>
           <Id>2</Id>
@@ -62,7 +62,7 @@
       <Classes>
         <Class>
           <Id>1</Id>
-          <Name>Missing</Name>
+          <Name>Not supplied</Name>
         </Class>
         <Class>
           <Id>2</Id>
@@ -80,7 +80,7 @@
       <Classes>
         <Class>
           <Id>1</Id>
-          <Name>Missing</Name>
+          <Name>Not supplied</Name>
         </Class>
         <Class>
           <Id>2</Id>
@@ -98,7 +98,7 @@
       <Classes>
         <Class>
           <Id>1</Id>
-          <Name>Missing</Name>
+          <Name>Not supplied</Name>
         </Class>
         <Class>
           <Id>2</Id>
@@ -116,7 +116,7 @@
       <Classes>
         <Class>
           <Id>1</Id>
-          <Name>Missing</Name>
+          <Name>Not supplied</Name>
         </Class>
         <Class>
           <Id>2</Id>
@@ -128,7 +128,7 @@
         </Class>
       </Classes>
     </Attribute>
-    <Attribute>
+    <!--<Attribute>
       <Name>Data Source</Name>
       <Type>Enumerated</Type>
       <Classes>
@@ -145,7 +145,7 @@
           <Name>Incorrect</Name>
         </Class>
       </Classes>
-    </Attribute>
+    </Attribute>-->
   </Attributes>
   <Ignore>
     <Columns>

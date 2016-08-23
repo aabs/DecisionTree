@@ -8,7 +8,7 @@ namespace bdd
 {
     public class Environment
     {
-        public Environment(Dictionary<string, int> args)
+        public Environment(Dictionary<string, string> args)
         {
             if (args == null)
             {
@@ -35,8 +35,8 @@ namespace bdd
         public SymbolTable SymbolTable { get; private set; }
         public bool SingleAssignment { get; private set; }
 
-        Dictionary<int, int> boundVariables = new Dictionary<int, int>();
-        public int? Resolve(int symbolId)
+        Dictionary<int, string> boundVariables = new Dictionary<int, string>();
+        public string Resolve(int symbolId)
         {
             if (boundVariables.ContainsKey(symbolId))
             {
@@ -52,7 +52,7 @@ namespace bdd
             }
         }
 
-        public int? Resolve(string variableName)
+        public string Resolve(string variableName)
         {
             var id = SymbolTable.GetSymbolId(variableName);
             if (id.HasValue)
@@ -62,7 +62,7 @@ namespace bdd
             throw new DecisionException("Unresolved symbol name");
         }
 
-        public void Bind(string variableName, int value)
+        public void Bind(string variableName, string value)
         {
             var id = SymbolTable.GetSymbolId(variableName);
             if (!id.HasValue)
@@ -72,7 +72,7 @@ namespace bdd
             Bind(id.Value, value);
         }
 
-        public void Bind(int variableId, int value)
+        public void Bind(int variableId, string value)
         {
             if (SingleAssignment)
             {

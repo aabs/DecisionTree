@@ -10,8 +10,12 @@ namespace bdd
     {
         public Node TreeRoot { get; set; }
 
-        public Environment Environment { get; private set; }
+        public Environment Environment { get; set; }
 
+        public DecisionTree()
+        {
+
+        }
         public DecisionTree(DecisionTree dt)
         {
             // copy across references to the environment, but duplicate everything else
@@ -91,17 +95,27 @@ namespace bdd
         }
         */
 
-        public int Evaluate(Node node)
+        public string Evaluate(Node node)
         {
-            throw new NotImplementedException();
-            //var variableValue = Environment.Resolve(node.SymbolId).Value;
-            //var path = variableValue == 0 ? node.Lo : node.Hi;
-
-            //if (IsTerminal(path)) return path;
-            //return Evaluate(path);
+            if (node is TerminalNode)
+            {
+                var x = node as TerminalNode;
+                return x.Result as string;
+            }
+            var bn = node as BranchNode;
+            //throw new NotImplementedException();
+            var variableValue = Environment.Resolve(bn.SymbolId);
+            foreach (var b in bn.Branches)
+            {
+                if ((string)b.Key.Value == variableValue)
+                {
+                    return Evaluate(b.Value);
+                }
+            }
+            throw new DecisionException("unrecognised path in tree");
         }
 
-        public int Evaluate()
+        public string Evaluate()
         {
             return Evaluate(TreeRoot);
         }

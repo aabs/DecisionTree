@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
@@ -88,11 +89,12 @@ namespace bdd
         {
             String csvString = File.ReadAllText(Config.SampleDataLocation);
             String[][] data = CsvParser.Parse(csvString);
-            var samples = ConvertSampleDataToDataSet(data);
-            var root = CreateTree(samples.Tables["Samples"].AsEnumerable(),
+            var samples = ConvertSampleDataToDataSet(data).Tables["Samples"].AsEnumerable();
+            Config.AllSamples = samples;
+            var root = CreateTree(samples,
                 Config.Attributes);
-
-            throw new NotImplementedException();
+            Debug.WriteLine(root.PrettyPrint());
+            return new DecisionTree { TreeRoot = root };
         }
 
         public Node CreateTree(IEnumerable<DataRow> examples,
@@ -131,7 +133,7 @@ namespace bdd
 
         private IEnumerable<DataRow> FilterExamplesToSubclassOfAttribute(IEnumerable<DataRow> examples, DecisionSpaceAttribute attr, DataClass cls)
         {
-            var col = ConvertAttributeNameToColumnName(attr.Name);
+            var col = UtilityFunctions.ConvertAttributeNameToColumnName(attr.Name);
             return examples.Where(e => e.Field<string>(col) == cls.Name);
         }
 
@@ -142,7 +144,7 @@ namespace bdd
 
         private bool SamplesContainInstanceWithAttributeInClass(IEnumerable<DataRow> examples, DecisionSpaceAttribute attr, DataClass cls)
         {
-            var col = ConvertAttributeNameToColumnName(attr.Name);
+            var col = UtilityFunctions.ConvertAttributeNameToColumnName(attr.Name);
             return examples.Any(dr => dr.Field<string>(col) == cls.Name);
         }
 
@@ -193,7 +195,7 @@ namespace bdd
 
         double AverageEntropy(IEnumerable<DataRow> samples, DecisionSpaceAttribute attr)
         {
-            string attrColName = ConvertAttributeNameToColumnName(attr.Name);
+            string attrColName = UtilityFunctions.ConvertAttributeNameToColumnName(attr.Name);
 
             var parentClassEntropy = ComputeEntropy(samples);
 
@@ -250,7 +252,7 @@ namespace bdd
 
             foreach (var attr in this.Config.Attributes)
             {
-                var colName = ConvertAttributeNameToColumnName(attr.Name);
+                var colName = UtilityFunctions.ConvertAttributeNameToColumnName(attr.Name);
                 namemap[attr.Name] = colName;
                 st.Columns.Add(colName, typeof(String));
                 int ordinal = columnNamesRow.IndexOf(attr.Name);
@@ -272,12 +274,5 @@ namespace bdd
             return result;
         }
 
-        private string ConvertAttributeNameToColumnName(string name)
-        {
-            return name.Replace(' ', '_')
-                .Replace('\'', '_')
-                .Replace('\"', '_')
-                .Replace('\t', '_');
-        }
     }
 }
