@@ -6,48 +6,47 @@ using System.Threading.Tasks;
 
 namespace bdd
 {
-    public class Tree<TNodeType, TEdgeLabelType>
-        where TNodeType : IEquatable<TNodeType>
+    public class Graph<TVertexType, TEdgeLabelType>
+        where TVertexType : IEquatable<TVertexType>
         where TEdgeLabelType : IEquatable<TEdgeLabelType>
     {
         /// <summary>
-        /// A link to the root node of the object graph that is the tree.
+        /// A link to the root node of the object graph that is the graph.
         /// </summary>
         /// <remarks>
-        /// The <see cref="Tree{TEdgeLabelType, TNodeType}"/> type is really just a holder 
-        /// for the actual tree which is the set of <see cref="TreeNode{TNodeType}"/> 
-        /// and <see cref="TreeEdge{TEdgeLabelType}"/>
+        /// The <see cref="Graph{TEdgeLabelType, TVertexType}"/> type is really just a holder 
+        /// for the actual graph which is the set of <see cref="GraphVertex{TVertexType}"/> 
+        /// and <see cref="GraphEdge{TEdgeLabelType}"/>
         /// </remarks>
-        public TreeEdge<TNodeType, TEdgeLabelType> Root { get; set; }
-        public IEnumerable<TreeNode<TNodeType, TEdgeLabelType>> Nodes
+        public GraphEdge<TVertexType, TEdgeLabelType> Root { get; set; }
+        public IEnumerable<GraphVertex<TVertexType, TEdgeLabelType>> Vertexs
         {
             get
             {
-                return GetAllNodes(Root.TargetNode);
+                return GetAllVertexs(Root.TargetVertex);
             }
         }
 
-        private IEnumerable<TreeNode<TNodeType, TEdgeLabelType>> GetAllNodes(TreeNode<TNodeType, TEdgeLabelType> n)
+        private IEnumerable<GraphVertex<TVertexType, TEdgeLabelType>> GetAllVertexs(GraphVertex<TVertexType, TEdgeLabelType> n)
         {
             yield return n;
-            var childNodes = n.Children.SelectMany(c => GetAllNodes(c.TargetNode));
-            foreach (var cn in childNodes)
+            var childVertexs = n.Children.SelectMany(c => GetAllVertexs(c.TargetVertex));
+            foreach (var cn in childVertexs)
             {
                 yield return cn;
             }
         }
     }
 
-
-    public class TreeNode<TNodeType, TEdgeLabelType>
-        where TNodeType : IEquatable<TNodeType>
+    public class GraphVertex<TVertexType, TEdgeLabelType>
+        where TVertexType : IEquatable<TVertexType>
         where TEdgeLabelType : IEquatable<TEdgeLabelType>
     {
-        public IEnumerable<TreeEdge<TNodeType, TEdgeLabelType>> Parents { get; }
-        public TNodeType Value { get; set; }
-        List<TreeEdge<TNodeType, TEdgeLabelType>> children = new List<TreeEdge<TNodeType, TEdgeLabelType>>();
+        public IEnumerable<GraphEdge<TVertexType, TEdgeLabelType>> Parents { get; }
+        public TVertexType Value { get; set; }
+        List<GraphEdge<TVertexType, TEdgeLabelType>> children = new List<GraphEdge<TVertexType, TEdgeLabelType>>();
 
-        public IEnumerable<TreeEdge<TNodeType, TEdgeLabelType>> Children
+        public IEnumerable<GraphEdge<TVertexType, TEdgeLabelType>> Children
         {
             get
             {
@@ -55,31 +54,31 @@ namespace bdd
             }
         }
 
-        public TreeNode<TNodeType, TEdgeLabelType> AddChild(TNodeType n, TEdgeLabelType e)
+        public GraphVertex<TVertexType, TEdgeLabelType> AddChild(TVertexType n, TEdgeLabelType e)
         {
             if (children.Any(c => c.LinkLabel.Equals(e)))
             {
                 throw new ApplicationException("Child link already exists.  Consider using Replace operation instead.");
             }
 
-            var treeNode = new TreeNode<TNodeType, TEdgeLabelType>
+            var graphVertex = new GraphVertex<TVertexType, TEdgeLabelType>
             {
                 Value = n
             };
-            children.Add(new TreeEdge<TNodeType, TEdgeLabelType>
+            children.Add(new GraphEdge<TVertexType, TEdgeLabelType>
                 {
                 LinkLabel = e,
-                TargetNode = treeNode
+                TargetVertex = graphVertex
                 });
-            return treeNode;
+            return graphVertex;
         }
     }
 
-    public class TreeEdge<TNodeType, TEdgeLabelType>
-        where TNodeType : IEquatable<TNodeType>
+    public class GraphEdge<TVertexType, TEdgeLabelType>
+        where TVertexType : IEquatable<TVertexType>
         where TEdgeLabelType : IEquatable<TEdgeLabelType>
     {
         public TEdgeLabelType LinkLabel { get; set; }
-        public TreeNode<TNodeType, TEdgeLabelType> TargetNode { get; set; }
+        public GraphVertex<TVertexType, TEdgeLabelType> TargetVertex { get; set; }
     }
 }
