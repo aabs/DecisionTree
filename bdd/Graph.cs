@@ -43,7 +43,6 @@ namespace bdd
         public IEnumerable<Edge<TVertexType, TEdgeLabelType>> Parents { get; }
         public TVertexType Content { get; set; }
         List<Edge<TVertexType, TEdgeLabelType>> children = new List<Edge<TVertexType, TEdgeLabelType>>();
-        private string v;
 
         public Vertex(TVertexType v)
         {

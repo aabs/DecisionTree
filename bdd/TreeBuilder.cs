@@ -71,7 +71,7 @@ namespace bdd
         private Outcomes LoadOutcomes(XElement root)
         {
             var outcomesElement = root.Element("Outcomes");
-            var vals = from o in outcomesElement.Descendants("Content")
+            var vals = from o in outcomesElement.Descendants("Value")
                        select new Outcome
                        {
                            Id = int.Parse(o.Element("Id").Value),
@@ -89,7 +89,7 @@ namespace bdd
         public DecisionTree CreateTree()
         {
             String csvString = File.ReadAllText(SymbolTable.DecisionMetadata.SampleDataLocation);
-            String[][] data = CsvParser.Parse(csvString);
+            String[][] data = CsvParser.Parse(csvString, new CsvSettings { FieldDelimiter = ',', RowDelimiter="\n"});
             var samples = ConvertSampleDataToDataSet(data).Tables["Samples"].AsEnumerable();
             SymbolTable.DecisionMetadata.AllSamples = samples;
             var root = CreateTree(samples,

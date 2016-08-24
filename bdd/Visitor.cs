@@ -31,7 +31,7 @@ namespace bdd
             {
                 visitor.Visit(n);
             }
-            else if (n.TargetVertex.Content is DtBranchTest)
+            else if (n.TargetVertex.Content is DtTest)
             {
                 if (visitor.StartVisit(n))
                 {
@@ -42,7 +42,7 @@ namespace bdd
                         {
                             AcceptLeaf(child, visitor);
                         }
-                        else if (child is DtBranchTest)
+                        else if (targetNode is DtTest)
                         {
                             AcceptBranch(child, visitor);
                         }
