@@ -97,7 +97,6 @@ namespace bdd
                     Root = new Edge<BaseDtVertexType, DtBranchTest>(new DtBranchTest(null), root)
                 }
             };
-            Dispatcher<BaseDtVertexType, DtBranchTest>.AcceptBranch(dt.Tree.Root, new PrettyPrinter(dt));
             return dt;
         }
 

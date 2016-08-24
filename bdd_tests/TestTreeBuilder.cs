@@ -3,6 +3,7 @@ using bdd;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Data;
+using System.Diagnostics;
 
 namespace bdd_tests
 {
@@ -31,13 +32,30 @@ namespace bdd_tests
             var sut = new TreeBuilder(testDataCsvFile);
             var dt = sut.CreateTree();
 
+            int correct = 0, total = 0;
+
             foreach (DataRow row in sut.SymbolTable.DecisionMetadata.AllSamples)
             {
                 var environment = RowToEnv(sut.SymbolTable, row);
                 var evaluator = new EvaluatorVisitor(dt, environment);
-                Dispatcher<BaseDtVertexType, DtBranchTest>.AcceptBranch(dt.Tree.Root, evaluator);
-                row.Field<string>("DecisionOutcome").Should().Be(evaluator.EvaluatedResult);
+                evaluator.Visit(dt.Tree.Root);
+                if (evaluator.EvaluatedResult.Equals(row["DecisionOutcome"]))
+                {
+                    correct++;
+                }
+                else
+                {
+                    Debug.Write($"Fail: (Eval: {evaluator.EvaluatedResult})\t");
+                    foreach (var c in row.Table.Columns)
+                    {
+                        var col = c as DataColumn;
+                        Debug.Write($"{col.ColumnName}: {row[col.ColumnName]},\t");
+                    }
+                    Debug.Write("\n");
+                }
+                total++;
             }
+            correct.Should().Be(total);
         }
 
         private bdd.Environment RowToEnv(SymbolTable st, DataRow row)

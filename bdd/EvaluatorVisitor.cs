@@ -1,22 +1,23 @@
-﻿using System;
+﻿using bdd;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace bdd
+namespace bdd_ignore
 {
     using DtNode = Edge<BaseDtVertexType, DtBranchTest>;
     public class EvaluatorVisitor : BaseVisitor<BaseDtVertexType, DtBranchTest>, IVisitor<BaseDtVertexType, DtBranchTest>
     {
-        public EvaluatorVisitor(DecisionTree<BaseDtVertexType, DtBranchTest> dt, Environment environment):base(dt)
+        public EvaluatorVisitor(DecisionTree<BaseDtVertexType, DtBranchTest> dt, bdd.Environment environment):base(dt)
         {
             EvaluatedResult = null;
             this.Environment = environment;
         }
 
-        public Environment Environment { get; private set; }
+        public bdd.Environment Environment { get; private set; }
         public string EvaluatedResult { get; set; }
         public override bool StartVisit(DtNode n)
         {
