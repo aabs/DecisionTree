@@ -6,24 +6,30 @@ using System.Threading.Tasks;
 
 namespace bdd
 {
-    public class DecisionTree
+    public class DecisionTree<TNodeType, TTestType>
+        where TNodeType : IEquatable<TNodeType>
+        where TTestType : IEquatable<TTestType>
+    {
+        public Graph<TNodeType, TTestType> Tree { get; set; }
+    }
+    public class DecisionTree__OLD
     {
         public Node TreeRoot { get; set; }
 
         public Environment Environment { get; set; }
 
-        public DecisionTree()
+        public DecisionTree__OLD()
         {
 
         }
-        public DecisionTree(DecisionTree dt)
+        public DecisionTree__OLD(DecisionTree__OLD dt)
         {
             // copy across references to the environment, but duplicate everything else
             this.Environment = dt.Environment;
             TreeRoot = dt.TreeRoot;
         }
 
-        public DecisionTree(Environment env)
+        public DecisionTree__OLD(Environment env)
         {
             if (env == null)
             {
@@ -48,7 +54,7 @@ namespace bdd
  *        public BranchNode_OLD CreateNode(string v)
         {
             TestVariableNameValidity(v);
-            var symbolId = Environment.SymbolTable.GetSymbolId(v).Value;
+            var symbolId = Environment.SymbolTable.GetSymbolId(v).Content;
             if (Nodes.ContainsKey(symbolId))
             {
                 throw new DecisionException("node already exists");
@@ -61,7 +67,7 @@ namespace bdd
         public BranchNode_OLD CreateNode(string v, BranchNode_OLD fail, BranchNode_OLD pass)
         {
             TestVariableNameValidity(v);
-            var symbolId = Environment.SymbolTable.GetSymbolId(v).Value;
+            var symbolId = Environment.SymbolTable.GetSymbolId(v).Content;
             var id = nextNodeId++;
             Nodes[id] = new BranchNode_OLD(id, symbolId, fail.Id, pass.Id);
             return Nodes[id];
@@ -70,7 +76,7 @@ namespace bdd
         public BranchNode_OLD CreateNode(string v, int fail, BranchNode_OLD pass)
         {
             TestVariableNameValidity(v);
-            var symbolId = Environment.SymbolTable.GetSymbolId(v).Value;
+            var symbolId = Environment.SymbolTable.GetSymbolId(v).Content;
             var id = GetNextNodeId();
             Nodes[id] = new BranchNode_OLD(id, symbolId, fail, pass.Id);
             return Nodes[id];
@@ -79,7 +85,7 @@ namespace bdd
         public BranchNode_OLD CreateNode(string v, BranchNode_OLD fail, int pass)
         {
             TestVariableNameValidity(v);
-            var symbolId = Environment.SymbolTable.GetSymbolId(v).Value;
+            var symbolId = Environment.SymbolTable.GetSymbolId(v).Content;
             var id = GetNextNodeId();
             Nodes[id] = new BranchNode_OLD(id, symbolId, fail.Id, pass);
             return Nodes[id];
@@ -88,7 +94,7 @@ namespace bdd
         public BranchNode_OLD CreateNode(string v, int fail, int pass)
         {
             TestVariableNameValidity(v);
-            var symbolId = Environment.SymbolTable.GetSymbolId(v).Value;
+            var symbolId = Environment.SymbolTable.GetSymbolId(v).Content;
             var id = GetNextNodeId();
             Nodes[id] = new BranchNode_OLD(id, symbolId, fail, pass);
             return Nodes[id];

@@ -13,7 +13,7 @@ namespace bdd_tests
         {
             //var st = new SymbolTable();
             //var env = new Environment(st);
-            //var sut = new DecisionTree(env);
+            //var sut = new DecisionTree__OLD(env);
             //var redundantBranchNode = sut.CreateNode("b", 0, 0);
             //var rootNode = sut.CreateNode("a", redundantBranchNode, 1);
             //sut.RootIndex = rootNode.Id;

@@ -18,14 +18,14 @@ namespace bdd_tests
         [ExpectedException(typeof(System.ArgumentNullException))]
         public void CannotCreateDTWithNullArgs()
         {
-            var sut = new DecisionTree((Environment)null);
+            var sut = new DecisionTree__OLD((Environment)null);
         }
         [TestMethod]
         public void CanCreateNodeInDecisionTree()
         {
             var st = new SymbolTable();
             var env = new Environment(st);
-            var sut = new DecisionTree(env);
+            var sut = new DecisionTree__OLD(env);
             var n = sut.CreateNode("a");
             sut.GetNode(n.Id).Should().NotBeNull();
         }
@@ -35,7 +35,7 @@ namespace bdd_tests
         {
             var st = new SymbolTable();
             var env = new Environment(st);
-            var sut = new DecisionTree(env);
+            var sut = new DecisionTree__OLD(env);
             var rootNode = sut.CreateNode(
                 "a",
                 sut.CreateNode("b", 0, 1),
@@ -46,17 +46,17 @@ namespace bdd_tests
             CheckNode(sut, rootNode.Id);
         }
 
-        public void CheckNode(DecisionTree dt, int rootId)
+        public void CheckNode(DecisionTree__OLD dt, int rootId)
         {
             var root = dt.GetNode(rootId);
             root.Should().NotBeNull();
-            if (root.Value.Hi > 1)
+            if (root.Content.Hi > 1)
             {
-                CheckNode(dt, root.Value.Hi);
+                CheckNode(dt, root.Content.Hi);
             }
-            if (root.Value.Lo > 1)
+            if (root.Content.Lo > 1)
             {
-                CheckNode(dt, root.Value.Lo);
+                CheckNode(dt, root.Content.Lo);
             }
         }
 
@@ -64,7 +64,7 @@ namespace bdd_tests
         public void EvaluateBaseCase()
         {
             var env = new Environment(new Dictionary<string, int> { { "a", 0 } });
-            var sut = new DecisionTree(env);
+            var sut = new DecisionTree__OLD(env);
             var rootNode = sut.CreateNode("a", 0, 1);
             sut.Evaluate(rootNode.Id).Should().Be(0);
         }
@@ -73,7 +73,7 @@ namespace bdd_tests
         public void EvaluateTwoLevelCase()
         {
             var env = new Environment(new Dictionary<string, int> { { "a", 0 }, { "b", 1 } });
-            var sut = new DecisionTree(env);
+            var sut = new DecisionTree__OLD(env);
             var rootNode = sut.CreateNode("a",
                 sut.CreateNode("b", 0, 1),
                 sut.CreateNode("b", 1, 1));
@@ -84,7 +84,7 @@ namespace bdd_tests
         public void EvaluateThreeLevelCase()
         {
             var env = new Environment(new Dictionary<string, int> { { "a", 1 }, { "b", 1 }, { "c", 1 } });
-            var sut = new DecisionTree(env);
+            var sut = new DecisionTree__OLD(env);
             var rootNode = sut.CreateNode(
                 "a",
                 sut.CreateNode("b", 0, 1),

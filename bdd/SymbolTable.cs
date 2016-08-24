@@ -19,7 +19,7 @@ namespace bdd
         /// An enumeration of the possible instances of this attribute, 
         /// or a pre-defined set of subsets of the possible values.
         /// </summary>
-        public List<AttributeClassicationInstance> Classifications { get; set; }
+        public List<AttributePermissibleValue> PermittedValues { get; set; }
     }
 
     /// <summary>
@@ -30,7 +30,7 @@ namespace bdd
     /// (i.e. age might be divided into bands, booleans into true or false, enums into specific values)
     /// then this class is used to represent one of the instances of the classification.
     /// </remarks>
-    public class AttributeClassicationInstance
+    public class AttributePermissibleValue
     {
         // The name given to the classification set
         public string ClassName { get; set; }
@@ -47,6 +47,18 @@ namespace bdd
         private static int nextId = 0;
 
         Dictionary<string, SymbolTableEntry> symbols = new Dictionary<string, SymbolTableEntry>();
+
+        public SymbolTable(Decision d)
+        {
+            this.DecisionMetadata = d;
+        }
+
+        public SymbolTable()
+        {
+        }
+
+        public Decision DecisionMetadata { get; internal set; }
+
         public int DeclareBooleanVariable(string variableName)
         {
             if (symbols.ContainsKey(variableName))
@@ -58,9 +70,9 @@ namespace bdd
                 Id = nextId++,
                 Name = variableName,
                 AttributeType = typeof(bool),
-                Classifications = new List<AttributeClassicationInstance> {
-                        new AttributeClassicationInstance {ClassName ="true", Value = true },
-                        new AttributeClassicationInstance {ClassName ="false", Value = false }
+                PermittedValues = new List<AttributePermissibleValue> {
+                        new AttributePermissibleValue {ClassName ="true", Value = true },
+                        new AttributePermissibleValue {ClassName ="false", Value = false }
                     }
             };
             symbols[newEntry.Name] = newEntry;
@@ -77,10 +89,10 @@ namespace bdd
                 Id = nextId++,
                 Name = variableName,
                 AttributeType = typeof(int),
-                Classifications = new List<AttributeClassicationInstance> {
-                        new AttributeClassicationInstance {ClassName ="missing", Value = 0 },
-                        new AttributeClassicationInstance {ClassName ="true", Value = 1 },
-                        new AttributeClassicationInstance {ClassName ="false", Value = 2 }
+                PermittedValues = new List<AttributePermissibleValue> {
+                        new AttributePermissibleValue {ClassName ="missing", Value = 0 },
+                        new AttributePermissibleValue {ClassName ="true", Value = 1 },
+                        new AttributePermissibleValue {ClassName ="false", Value = 2 }
                     }
             };
             symbols[newEntry.Name] = newEntry;
@@ -98,7 +110,7 @@ namespace bdd
                 Id = nextId++,
                 Name = variableName,
                 AttributeType = typeof(int),
-                Classifications = vals.Select(p => new AttributeClassicationInstance { ClassName =p.Key, Value = p.Value }).ToList()
+                PermittedValues = vals.Select(p => new AttributePermissibleValue { ClassName =p.Key, Value = p.Value }).ToList()
             };
             symbols[newEntry.Name] = newEntry;
             return newEntry.Id;

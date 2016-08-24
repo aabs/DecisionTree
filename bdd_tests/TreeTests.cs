@@ -23,8 +23,8 @@ namespace bdd_tests
             sut.Children.Count().Should().Be(0);
             sut.AddChild("node", "link");
             sut.Children.Count().Should().Be(1);
-            sut.Children.First().LinkLabel.Should().Be("link");
-            sut.Children.First().TargetVertex.Value.Should().Be("node");
+            sut.Children.First().Label.Should().Be("link");
+            sut.Children.First().TargetVertex.Content.Should().Be("node");
         }
 
         [TestMethod]
@@ -34,8 +34,8 @@ namespace bdd_tests
             sut.Children.Count().Should().Be(0);
             sut["edge"] = "vertex";
             sut.Children.Count().Should().Be(1);
-            sut.Children.First().LinkLabel.Should().Be("edge");
-            sut.Children.First().TargetVertex.Value.Should().Be("vertex");
+            sut.Children.First().Label.Should().Be("edge");
+            sut.Children.First().TargetVertex.Content.Should().Be("vertex");
         }
 
         [TestMethod]
@@ -203,8 +203,8 @@ namespace bdd_tests
             sut.Children.Count().Should().Be(0);
             sut.AddChild(new TestVertexType(3), new TestEdgeType(4));
             sut.Children.Count().Should().Be(1);
-            sut.Children.First().LinkLabel.LabelType.Should().Be(4);
-            sut.Children.First().TargetVertex.Value.Name.Should().Be(3);
+            sut.Children.First().Label.LabelType.Should().Be(4);
+            sut.Children.First().TargetVertex.Content.Name.Should().Be(3);
         }
 
         [TestMethod]
@@ -218,8 +218,8 @@ namespace bdd_tests
 
             sut[e1] = v1;
             sut.Children.Count().Should().Be(1);
-            sut.Children.First().LinkLabel.LabelType.Should().Be(5);
-            sut.Children.First().TargetVertex.Value.Name.Should().Be(7);
+            sut.Children.First().Label.LabelType.Should().Be(5);
+            sut.Children.First().TargetVertex.Content.Name.Should().Be(7);
         }
 
         [TestMethod]

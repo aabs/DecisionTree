@@ -9,7 +9,6 @@ namespace bdd
 {
     public class Decision
     {
-        public SymbolTable SymbolTable { get; set; }
         public string SampleDataLocation { get; set; }
         public Outcomes Outcomes { get; set; }
         public List<DecisionSpaceAttribute> Attributes { get; set; }

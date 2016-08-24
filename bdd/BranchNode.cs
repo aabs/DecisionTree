@@ -7,6 +7,60 @@ using System.Text;
 
 namespace bdd
 {
+    public abstract class BaseDtVertexType : IEquatable<BaseDtVertexType>
+    {
+        public bool Equals(BaseDtVertexType other) { return false; }
+    }
+
+    public class DtTest : BaseDtVertexType, IEquatable<DtTest>
+    {
+        public DtTest(DecisionSpaceAttribute attribute)
+        {
+            this.Attribute = attribute;
+        }
+        public DecisionSpaceAttribute Attribute { get; set; }
+
+        public new bool Equals(BaseDtVertexType other)
+        {
+            return Equals(other as DtTest);
+        }
+
+        public bool Equals(DtTest other)
+        {
+            return Attribute.Equals(other.Attribute);
+        }
+    }
+
+    public class DtOutcome : BaseDtVertexType, IEquatable<DtOutcome>
+    {
+        public DtOutcome(string outcome)
+        {
+            this.OutcomeValue = outcome;
+        }
+        public string OutcomeValue { get; set; }
+        public new bool Equals(BaseDtVertexType other)
+        {
+            return Equals(other as DtTest);
+        }
+
+        public bool Equals(DtOutcome other)
+        {
+            return OutcomeValue.Equals(other.OutcomeValue);
+        }
+    }
+
+    public class DtBranchTest : IEquatable<DtBranchTest>
+    {
+        public AttributePermissibleValue TestValue { get; set; }
+        public DtBranchTest(AttributePermissibleValue testValue)
+        {
+            this.TestValue = testValue;
+        }
+        public bool Equals(DtBranchTest other)
+        {
+            return TestValue.Equals(other.TestValue);
+        }
+    }
 
     public abstract class Node
     {
@@ -62,8 +116,8 @@ namespace bdd
         /// <summary>
         /// collection of outgoing branches, each of which corresponds to some AttributeClassicationInstance
         /// </summary>
-        Dictionary<AttributeClassicationInstance, Node> branches = new Dictionary<AttributeClassicationInstance, Node>();
-        public Dictionary<AttributeClassicationInstance, Node> Branches
+        Dictionary<AttributePermissibleValue, Node> branches = new Dictionary<AttributePermissibleValue, Node>();
+        public Dictionary<AttributePermissibleValue, Node> Branches
         {
             get { return branches; }
             set { branches = value; }
@@ -102,72 +156,5 @@ namespace bdd
             return sb.ToString();
         }
 
-    }
-    public struct BranchNode_OLD
-    {
-        public BranchNode_OLD(BranchNode_OLD n) : this(n.Id, n.SymbolId, n.Lo, n.Hi)
-        {
-        }
-        public BranchNode_OLD(int id, int symbolId, int fail, int pass)
-        {
-            values = new int[4] { id, fail, pass, symbolId };
-        }
-        public BranchNode_OLD(int id, int symbolId, BranchNode_OLD fail, BranchNode_OLD pass)
-        {
-            values = new int[4] { id, fail.Id, pass.Id, symbolId };
-        }
-        public BranchNode_OLD(int id, int symbolId, int fail, BranchNode_OLD pass)
-        {
-            values = new int[4] { id, fail, pass.Id, symbolId };
-        }
-        public BranchNode_OLD(int id, int symbolId, BranchNode_OLD fail, int pass)
-        {
-            values = new int[4] { id, fail.Id, pass, symbolId };
-        }
-        public int[] values { get; set; }
-        public int Id
-        {
-            get
-            {
-                return values[0];
-            }
-            set
-            {
-                values[0] = value;
-            }
-        }
-        public int Lo
-        {
-            get
-            {
-                return values[1];
-            }
-            set
-            {
-                values[1] = value;
-            }
-        }
-        public int Hi
-        {
-            get
-            {
-                return values[2];
-            }
-            set
-            {
-                values[2] = value;
-            }
-        }
-        public int SymbolId
-        {
-            get
-            {
-                return values[3];
-            }
-            set
-            {
-                values[3] = value;
-            }
-        }
     }
 }

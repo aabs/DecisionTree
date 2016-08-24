@@ -41,13 +41,13 @@ namespace bdd
         where TEdgeLabelType : IEquatable<TEdgeLabelType>
     {
         public IEnumerable<Edge<TVertexType, TEdgeLabelType>> Parents { get; }
-        public TVertexType Value { get; set; }
+        public TVertexType Content { get; set; }
         List<Edge<TVertexType, TEdgeLabelType>> children = new List<Edge<TVertexType, TEdgeLabelType>>();
         private string v;
 
         public Vertex(TVertexType v)
         {
-            this.Value = v;
+            this.Content = v;
         }
 
         public IEnumerable<Edge<TVertexType, TEdgeLabelType>> Children
@@ -58,26 +58,27 @@ namespace bdd
             }
         }
 
-        public Vertex<TVertexType, TEdgeLabelType> AddChild(TVertexType n, TEdgeLabelType e)
+        public Vertex<TVertexType, TEdgeLabelType> AddChild(Edge<TVertexType, TEdgeLabelType> e)
         {
-            if (children.Any(c => c.LinkLabel.Equals(e)))
+            children.Add(e);
+            return this;
+        }
+
+        public void AddChild(TVertexType n, TEdgeLabelType e)
+        {
+            if (children.Any(c => c.Label.Equals(e)))
             {
                 throw new ApplicationException("Child link already exists.  Consider using Replace operation instead.");
             }
 
             var graphVertex = new Vertex<TVertexType, TEdgeLabelType>(n);
-            children.Add(new Edge<TVertexType, TEdgeLabelType>
-            {
-                LinkLabel = e,
-                TargetVertex = graphVertex
-            });
-            return graphVertex;
+            children.Add(new Edge<TVertexType, TEdgeLabelType>(e, graphVertex));
         }
 
         public Vertex<TVertexType, TEdgeLabelType> Child(TEdgeLabelType e)
         {
             return (from c in Children
-                    where c.LinkLabel.Equals(e)
+                    where c.Label.Equals(e)
                     select c.TargetVertex).First();
         }
 
@@ -85,13 +86,13 @@ namespace bdd
         {
             try
             {
-                bool result = this.Value.Equals(sut2.Value);
+                bool result = this.Content.Equals(sut2.Content);
                 result &= (Children.Count() == sut2.Children.Count());
 
                 foreach (var c in children)
                 {
-                    var v1 = Child(c.LinkLabel);
-                    var v2 = sut2.Child(c.LinkLabel);
+                    var v1 = Child(c.Label);
+                    var v2 = sut2.Child(c.Label);
                     result &= v1.EquivalentTo(v2);
                 }
 
@@ -109,7 +110,7 @@ namespace bdd
             {
                 try
                 {
-                    return Child(index).Value;
+                    return Child(index).Content;
                 }
                 catch (Exception e)
                 {
@@ -124,7 +125,19 @@ namespace bdd
         where TVertexType : IEquatable<TVertexType>
         where TEdgeLabelType : IEquatable<TEdgeLabelType>
     {
-        public TEdgeLabelType LinkLabel { get; set; }
+        public Edge(TEdgeLabelType e, Vertex<TVertexType, TEdgeLabelType> target)
+        {
+            Label = e;
+            TargetVertex = target;
+        }
+
+        public Edge(TVertexType v, TEdgeLabelType e)
+        {
+            Label = e;
+            TargetVertex = new Vertex<TVertexType, TEdgeLabelType>(v);
+        }
+        public TEdgeLabelType Label { get; set; }
+        public Vertex<TVertexType, TEdgeLabelType> OriginVertex { get; internal set; }
         public Vertex<TVertexType, TEdgeLabelType> TargetVertex { get; set; }
     }
 }

@@ -9,33 +9,34 @@ using System.Xml.Linq;
 
 namespace bdd
 {
+    using DecisionTree = DecisionTree<BaseDtVertexType, DtBranchTest>;
     public class TreeBuilder
     {
 
         public TreeBuilder(string metadataFileLocation)
         {
             XDocument doc = XDocument.Load(metadataFileLocation);
-            this.Config = LoadConfig(doc.Document.Root);
+            this.SymbolTable = LoadConfig(doc.Document.Root);
         }
 
         #region Configuration Loading
-        public Decision Config { get; private set; }
+        public SymbolTable SymbolTable { get; private set; }
 
-        private Decision LoadConfig(XElement root)
+        private SymbolTable LoadConfig(XElement root)
         {
-            var result = new Decision
+            var metadata = new Decision
             {
                 SampleDataLocation = root.Element("SampleData").Value,
                 Outcomes = LoadOutcomes(root),
                 Attributes = LoadAttributes(root)
             };
-            result.SymbolTable = BuildSymbolTable(result);
-            return result;
+            return BuildSymbolTable(metadata);
         }
 
         private SymbolTable BuildSymbolTable(Decision d)
         {
-            var result = new SymbolTable();
+            var result = new SymbolTable(d);
+
             foreach (var attr in d.Attributes)
             {
                 switch (attr.DataType)
@@ -70,7 +71,7 @@ namespace bdd
         private Outcomes LoadOutcomes(XElement root)
         {
             var outcomesElement = root.Element("Outcomes");
-            var vals = from o in outcomesElement.Descendants("Value")
+            var vals = from o in outcomesElement.Descendants("Content")
                        select new Outcome
                        {
                            Id = int.Parse(o.Element("Id").Value),
@@ -87,32 +88,39 @@ namespace bdd
 
         public DecisionTree CreateTree()
         {
-            String csvString = File.ReadAllText(Config.SampleDataLocation);
+            String csvString = File.ReadAllText(SymbolTable.DecisionMetadata.SampleDataLocation);
             String[][] data = CsvParser.Parse(csvString);
             var samples = ConvertSampleDataToDataSet(data).Tables["Samples"].AsEnumerable();
-            Config.AllSamples = samples;
+            SymbolTable.DecisionMetadata.AllSamples = samples;
             var root = CreateTree(samples,
-                Config.Attributes);
-            Debug.WriteLine(root.PrettyPrint());
-            return new DecisionTree { TreeRoot = root };
+                SymbolTable.DecisionMetadata.Attributes);
+            var dt = new DecisionTree
+            {
+                Tree = new Graph<BaseDtVertexType, DtBranchTest>
+                {
+                    Root = new Edge<BaseDtVertexType, DtBranchTest>(new DtBranchTest(null), root)
+                }
+            };
+            Dispatcher<BaseDtVertexType, DtBranchTest>.AcceptBranch(dt.Tree.Root, new PrettyPrinter(dt));
+            return dt;
         }
 
-        public Node CreateTree(IEnumerable<DataRow> examples,
+        public Vertex<BaseDtVertexType, DtBranchTest> CreateTree(IEnumerable<DataRow> examples,
             IEnumerable<DecisionSpaceAttribute> attributes)
         {
             // 0. if all samples have same outcome create terminal node with that outcome
-            foreach (var o in Config.Outcomes.Values)
+            foreach (var o in SymbolTable.DecisionMetadata.Outcomes.Values)
             {
                 if (AllSamplesHaveSameOutcome(examples, o))
                 {
-                    return new TerminalNode { Result = o.Name };
+                    return new Vertex<BaseDtVertexType, DtBranchTest>(new DtOutcome(o.Name));
                 }
             }
             // if we get to here, data must be variegated...
 
             // 1. find the best attribute to classify sample data
             var attr = GetDominatingAttribute(examples, attributes);
-            var result = new BranchNode(GetSymbolTableEntryFromAttribute(attr), null);
+            var result = new Vertex<BaseDtVertexType, DtBranchTest>(new DtTest(attr));
             // 2. for each class under that attribute
             foreach (DataClass cls in attr.Classes)
             {
@@ -124,8 +132,12 @@ namespace bdd
                     var filteredExamples = FilterExamplesToSubclassOfAttribute(examples, attr, cls);
                     //       with the attribute list filtered to remove the attribute
                     var filteredAttributes = attributes.Except(new[] { attr });
-                    var branchClass = new AttributeClassicationInstance { ClassName = cls.Name, Value = cls.Name };
-                    result.Branches[branchClass] = CreateTree(filteredExamples, filteredAttributes);
+                    var edgeLabel = new AttributePermissibleValue { ClassName = cls.Name, Value = cls.Name };
+                    var targetVertex = CreateTree(filteredExamples, filteredAttributes);
+                    var branch = new DtBranchTest(edgeLabel);
+                    var edge = new Edge<BaseDtVertexType, DtBranchTest>(branch, targetVertex);
+                    edge.OriginVertex = result;
+                    result.AddChild(edge);
                 }
             }
             return result;
@@ -139,7 +151,7 @@ namespace bdd
 
         private SymbolTableEntry GetSymbolTableEntryFromAttribute(DecisionSpaceAttribute attr)
         {
-            return Config.SymbolTable.GetEntry(attr.Name);
+            return SymbolTable.GetEntry(attr.Name);
         }
 
         private bool SamplesContainInstanceWithAttributeInClass(IEnumerable<DataRow> examples, DecisionSpaceAttribute attr, DataClass cls)
@@ -152,7 +164,7 @@ namespace bdd
             IEnumerable<DecisionSpaceAttribute> attributes)
         {
             Dictionary<DecisionSpaceAttribute, double> IGs = new Dictionary<DecisionSpaceAttribute, double>();
-            foreach (var attr in Config.Attributes)
+            foreach (var attr in SymbolTable.DecisionMetadata.Attributes)
             {
                 IGs[attr] = AverageEntropy(examples, attr);
             }
@@ -248,9 +260,9 @@ namespace bdd
             // first row must contain the column headers (order is not assumed)
             var columnNamesRow = samples[0].ToList();
             st.Columns.Add("DecisionOutcome", typeof(String));
-            int outcomeOrdinal = columnNamesRow.IndexOf(Config.Outcomes.OutcomeColumn);
+            int outcomeOrdinal = columnNamesRow.IndexOf(SymbolTable.DecisionMetadata.Outcomes.OutcomeColumn);
 
-            foreach (var attr in this.Config.Attributes)
+            foreach (var attr in SymbolTable.DecisionMetadata.Attributes)
             {
                 var colName = UtilityFunctions.ConvertAttributeNameToColumnName(attr.Name);
                 namemap[attr.Name] = colName;

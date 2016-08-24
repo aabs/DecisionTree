@@ -8,6 +8,11 @@ namespace bdd
 {
     public class Environment
     {
+        public SymbolTable SymbolTable { get; private set; }
+        Dictionary<int, string> boundVariables = new Dictionary<int, string>();
+        public Environment ParentEnvironment { get; set; }
+        public bool SingleAssignment { get; private set; }
+
         public Environment(Dictionary<string, string> args)
         {
             if (args == null)
@@ -31,11 +36,7 @@ namespace bdd
             this.ParentEnvironment = parent;
             this.SingleAssignment = singleAssignment;
         }
-        public Environment ParentEnvironment { get; set; }
-        public SymbolTable SymbolTable { get; private set; }
-        public bool SingleAssignment { get; private set; }
 
-        Dictionary<int, string> boundVariables = new Dictionary<int, string>();
         public string Resolve(int symbolId)
         {
             if (boundVariables.ContainsKey(symbolId))
@@ -48,7 +49,7 @@ namespace bdd
             }
             else
             {
-                return null;
+                throw new DecisionException("Unresolved symbol");
             }
         }
 
@@ -59,7 +60,16 @@ namespace bdd
             {
                 return Resolve(id.Value);
             }
-            throw new DecisionException("Unresolved symbol name");
+            throw new DecisionException("Unresolved symbol");
+        }
+        public string Resolve(DecisionSpaceAttribute attr)
+        {
+            var id = SymbolTable.GetSymbolId(attr.Name);
+            if (id.HasValue)
+            {
+                return Resolve(id.Value);
+            }
+            throw new DecisionException("Unresolved symbol");
         }
 
         public void Bind(string variableName, string value)
