@@ -59,9 +59,22 @@ namespace bdd
 
         public Decision DecisionMetadata { get; internal set; }
 
+        public Dictionary<string, SymbolTableEntry> Symbols
+        {
+            get
+            {
+                return symbols;
+            }
+
+            set
+            {
+                symbols = value;
+            }
+        }
+
         public int DeclareBooleanVariable(string variableName)
         {
-            if (symbols.ContainsKey(variableName))
+            if (Symbols.ContainsKey(variableName))
             {
                 throw new DecisionException("symbol already in use");
             }
@@ -75,12 +88,12 @@ namespace bdd
                         new AttributePermissibleValue {ClassName ="false", Value = false }
                     }
             };
-            symbols[newEntry.Name] = newEntry;
+            Symbols[newEntry.Name] = newEntry;
             return newEntry.Id;
         }
         public int DeclareMaybeBooleanVariable(string variableName)
         {
-            if (symbols.ContainsKey(variableName))
+            if (Symbols.ContainsKey(variableName))
             {
                 throw new DecisionException("symbol already in use");
             }
@@ -95,13 +108,13 @@ namespace bdd
                         new AttributePermissibleValue {ClassName ="false", Value = 2 }
                     }
             };
-            symbols[newEntry.Name] = newEntry;
+            Symbols[newEntry.Name] = newEntry;
             return newEntry.Id;
         }
 
         internal int DeclareEnumeratedVariable(string variableName, Dictionary<string, int> vals)
         {
-            if (symbols.ContainsKey(variableName))
+            if (Symbols.ContainsKey(variableName))
             {
                 throw new DecisionException("symbol already in use");
             }
@@ -110,20 +123,68 @@ namespace bdd
                 Id = nextId++,
                 Name = variableName,
                 AttributeType = typeof(int),
-                PermittedValues = vals.Select(p => new AttributePermissibleValue { ClassName =p.Key, Value = p.Value }).ToList()
+                PermittedValues = vals.Select(p => new AttributePermissibleValue { ClassName = p.Key, Value = p.Value }).ToList()
             };
-            symbols[newEntry.Name] = newEntry;
+            Symbols[newEntry.Name] = newEntry;
             return newEntry.Id;
         }
 
         public int? GetSymbolId(string name)
         {
-            return GetEntry(name).Id;
+            return GetEntry(name)?.Id;
         }
 
         public SymbolTableEntry GetEntry(string name)
         {
-            return symbols[name];
+            if (!Symbols.ContainsKey(name))
+            {
+                return null;
+            }
+            return Symbols[name];
+        }
+    }
+
+    public class SymbolTableBuilder
+    {
+        Decision d = null;
+        Dictionary<string, string[]> symbols = new Dictionary<string, string[]>();
+        public SymbolTableBuilder WithSymbol(string name, params string[] vals)
+        {
+            symbols[name] = vals;
+            return this;
+        }
+
+        public SymbolTableBuilder WithMetadata(Decision d)
+        {
+            this.d = d;
+            return this;
+        }
+
+        public SymbolTable Build()
+        {
+            int idDispenser = 1;
+            var result = new SymbolTable(d);
+            if (symbols.Count >= 0)
+            {
+                foreach (var s in symbols)
+                {
+                    var ste = new SymbolTableEntry
+                    {
+                        AttributeType = typeof(int),
+                        Id = idDispenser++,
+                        Name = s.Key,
+                        PermittedValues = s.Value.Select(v => new AttributePermissibleValue { Value = v, ClassName = v }).ToList()
+                    };
+                    result.Symbols[s.Key] = ste;
+                }
+            }
+            else
+            {
+                result.DeclareMaybeBooleanVariable("Surname");
+                result.DeclareMaybeBooleanVariable("First Name");
+                result.DeclareMaybeBooleanVariable("DOB");
+            }
+            return result;
         }
     }
 }

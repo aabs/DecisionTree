@@ -15,7 +15,7 @@ namespace bdd
 
         public TreeBuilder(string metadataFileLocation)
         {
-            XDocument doc = XDocument.Load(metadataFileLocation);
+            var doc = XDocument.Load(metadataFileLocation);
             this.SymbolTable = LoadConfig(doc.Document.Root);
         }
 
@@ -39,14 +39,10 @@ namespace bdd
 
             foreach (var attr in d.Attributes)
             {
-                switch (attr.DataType)
+                if (attr.DataType == "Enumerated")
                 {
-                    case "Enumerated":
-                        var vals = attr.Classes.ToDictionary(c => c.Name, c => c.Id);
-                        result.DeclareEnumeratedVariable(attr.Name, vals);
-                        break;
-                    default:
-                        break;
+                    var vals = attr.Classes.ToDictionary(c => c.Name, c => c.Id);
+                    result.DeclareEnumeratedVariable(attr.Name, vals);
                 }
             }
             return result;
@@ -88,8 +84,8 @@ namespace bdd
 
         public DecisionTree CreateTree()
         {
-            String csvString = File.ReadAllText(SymbolTable.DecisionMetadata.SampleDataLocation);
-            String[][] data = CsvParser.Parse(csvString, new CsvSettings { FieldDelimiter = ',', RowDelimiter="\n"});
+            var csvString = File.ReadAllText(SymbolTable.DecisionMetadata.SampleDataLocation);
+            var data = CsvParser.Parse(csvString, new CsvSettings { FieldDelimiter = ',', RowDelimiter = "\n" });
             var samples = ConvertSampleDataToDataSet(data).Tables["Samples"].AsEnumerable();
             SymbolTable.DecisionMetadata.AllSamples = samples;
             var root = CreateTree(samples,
@@ -145,7 +141,7 @@ namespace bdd
 
         private IEnumerable<DataRow> FilterExamplesToSubclassOfAttribute(IEnumerable<DataRow> examples, DecisionSpaceAttribute attr, DataClass cls)
         {
-            var col = UtilityFunctions.ConvertAttributeNameToColumnName(attr.Name);
+            var col = attr.Name;
             return examples.Where(e => e.Field<string>(col) == cls.Name);
         }
 
@@ -156,15 +152,15 @@ namespace bdd
 
         private bool SamplesContainInstanceWithAttributeInClass(IEnumerable<DataRow> examples, DecisionSpaceAttribute attr, DataClass cls)
         {
-            var col = UtilityFunctions.ConvertAttributeNameToColumnName(attr.Name);
+            var col = attr.Name;
             return examples.Any(dr => dr.Field<string>(col) == cls.Name);
         }
 
         DecisionSpaceAttribute GetDominatingAttribute(IEnumerable<DataRow> examples,
             IEnumerable<DecisionSpaceAttribute> attributes)
         {
-            Dictionary<DecisionSpaceAttribute, double> IGs = new Dictionary<DecisionSpaceAttribute, double>();
-            foreach (var attr in SymbolTable.DecisionMetadata.Attributes)
+            var IGs = new Dictionary<DecisionSpaceAttribute, double>();
+            foreach (var attr in attributes)
             {
                 IGs[attr] = AverageEntropy(examples, attr);
             }
@@ -175,44 +171,14 @@ namespace bdd
                 .FirstOrDefault().Key;
         }
 
-        /// <summary>
-        /// Generate a Decision Tree based on Ross Quinlan's ID3 Iterative Dichotomiser 3 Algorithm
-        /// </summary>
-        /// <returns></returns>
-        /// <remarks>
-        /// ID3 (Examples, Target_Attribute, Attributes)
-        ///    Create a root node for the tree
-        ///    If all examples are positive, Return the single-node tree Root, with label = +.
-        ///    If all examples are negative, Return the single-node tree Root, with label = -.
-        ///    If number of predicting attributes is empty, then Return the single node tree Root,
-        ///    with label = most common value of the target attribute in the examples.
-        ///    Otherwise Begin
-        ///        A ← The Attribute that best classifies examples.
-        ///        Decision Tree attribute for Root = A.
-        ///        For each possible value, vi, of A,
-        ///            Add a new tree branch below Root, corresponding to the test A = vi.
-        ///            Let Examples(vi) be the subset of examples that have the value vi for A
-        ///            If Examples(vi) is empty
-        ///                Then below this new branch add a leaf node with label = most common target value in the examples
-        ///            Else below this new branch add the subtree ID3(Examples(vi), Target_Attribute, Attributes – {A})
-        ///    End
-        ///    Return Root
-        /// </remarks>
-        Node ID3(IEnumerable<DataRow> examples,
-            DecisionSpaceAttribute Target_Attribute,
-            IEnumerable<DecisionSpaceAttribute> Attributes)
-        {
-            throw new NotImplementedException();
-        }
 
         double AverageEntropy(IEnumerable<DataRow> samples, DecisionSpaceAttribute attr)
         {
-            string attrColName = UtilityFunctions.ConvertAttributeNameToColumnName(attr.Name);
+            var attrColName = attr.Name;
 
             var parentClassEntropy = ComputeEntropy(samples);
 
-            double minEntropyFound = Double.MaxValue;
-            double informationGain = 0.0;
+            var informationGain = 0.0;
             foreach (DataClass cls in attr.Classes)
             {
                 var subSamples = samples.Where(dr => dr.Field<string>(attrColName) == cls.Name);
@@ -224,8 +190,8 @@ namespace bdd
 
         double ComputeEntropy(IEnumerable<DataRow> samples)
         {
-            int T = samples.Count();
-            Dictionary<string, int> tally = new Dictionary<string, int>();
+            var T = samples.Count();
+            var tally = new Dictionary<string, int>();
 
             foreach (var r in samples)
             {
@@ -246,34 +212,33 @@ namespace bdd
 
         bool AllSamplesHaveSameOutcome(IEnumerable<DataRow> samples, Outcome outcome)
         {
-            return Enumerable.All(samples,
-                dr => dr.Field<string>("DecisionOutcome") == outcome.Name);
+            return samples.All(dr => dr.Field<string>("DecisionOutcome") == outcome.Name);
         }
 
         DataSet ConvertSampleDataToDataSet(string[][] samples)
         {
-            DataSet result = new DataSet();
-            DataTable st = result.Tables.Add("Samples");
+            var result = new DataSet();
+            var st = result.Tables.Add("Samples");
             // mapping from attributes to ordinal numbers
-            Dictionary<string, int> map = new Dictionary<string, int>();
-            Dictionary<string, string> namemap = new Dictionary<string, string>();
+            var map = new Dictionary<string, int>();
+            var namemap = new Dictionary<string, string>();
             // first row must contain the column headers (order is not assumed)
             var columnNamesRow = samples[0].ToList();
             st.Columns.Add("DecisionOutcome", typeof(String));
-            int outcomeOrdinal = columnNamesRow.IndexOf(SymbolTable.DecisionMetadata.Outcomes.OutcomeColumn);
+            var outcomeOrdinal = columnNamesRow.IndexOf(SymbolTable.DecisionMetadata.Outcomes.OutcomeColumn);
 
             foreach (var attr in SymbolTable.DecisionMetadata.Attributes)
             {
-                var colName = UtilityFunctions.ConvertAttributeNameToColumnName(attr.Name);
+                var colName = attr.Name;
                 namemap[attr.Name] = colName;
                 st.Columns.Add(colName, typeof(String));
-                int ordinal = columnNamesRow.IndexOf(attr.Name);
+                var ordinal = columnNamesRow.IndexOf(attr.Name);
                 map[attr.Name] = ordinal;
             }
 
             foreach (string[] row in samples.Skip(1)) // 1st row is headers
             {
-                DataRow newRow = st.NewRow();
+                var newRow = st.NewRow();
                 foreach (var nvp in namemap)
                 {
                     var ord = map[nvp.Key];

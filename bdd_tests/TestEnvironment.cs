@@ -18,7 +18,8 @@ namespace bdd_tests
         [TestMethod]
         public void TestCanBindVariable()
         {
-            var st = new SymbolTable();
+            var stb = new SymbolTableBuilder().WithSymbol("a", "1", "2", "3");
+            var st = stb.Build();
             var sut = new Environment(st);
             sut.Bind("a", "2");
             sut.Resolve("a").Should().NotBeNull();

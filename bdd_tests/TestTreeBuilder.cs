@@ -6,13 +6,12 @@ using System.Data;
 
 namespace bdd_tests
 {
-    using DecisionTree = DecisionTree<BaseDtVertexType, DtBranchTest>;
-    [Microsoft.VisualStudio.TestTools.UnitTesting.TestClass]
+    [TestClass]
     public class TestTreeBuilder
     {
-        private const string testDataCsvFile = @"C:\dev\binarydecisiontree\testdata\problem-metadata.xml";
+        private const string testDataCsvFile = @"..\..\..\testdata\problem-metadata.xml";
 
-        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethod]
+        [TestMethod]
         public void CanCreateTreeBuilder()
         {
             var sut = new TreeBuilder(testDataCsvFile);
@@ -46,7 +45,7 @@ namespace bdd_tests
             var env = new bdd.Environment(st);
             foreach (var attr in st.DecisionMetadata.Attributes)
             {
-                var colName = UtilityFunctions.ConvertAttributeNameToColumnName(attr.Name);
+                var colName = attr.Name;
                 env.Bind(attr.Name, row.Field<string>(colName));
             }
             return env;

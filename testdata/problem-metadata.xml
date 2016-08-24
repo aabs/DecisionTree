@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <Decision>
-  <SampleData>C:\dev\binarydecisiontree\testdata\usm.mbrmatch.trainingdata.csv</SampleData>
+  <SampleData>..\..\..\testdata\usm.mbrmatch.trainingdata.csv</SampleData>
   <Outcomes>
     <Type>Enumerated</Type>
     <Column>Status</Column>

@@ -35,16 +35,28 @@ namespace bdd
     {
         public DtOutcome(string outcome)
         {
+            if (outcome == null)
+            {
+                throw new ArgumentNullException(nameof(outcome));
+            }
             this.OutcomeValue = outcome;
         }
         public string OutcomeValue { get; set; }
         public new bool Equals(BaseDtVertexType other)
         {
-            return Equals(other as DtTest);
+            if (other == null)
+            {
+                throw new ArgumentNullException(nameof(other));
+            }
+            return Equals(other as DtOutcome);
         }
 
         public bool Equals(DtOutcome other)
         {
+            if (other == null)
+            {
+                throw new ArgumentNullException(nameof(other));
+            }
             return OutcomeValue.Equals(other.OutcomeValue);
         }
     }
@@ -60,101 +72,5 @@ namespace bdd
         {
             return TestValue.Equals(other.TestValue);
         }
-    }
-
-    public abstract class Node
-    {
-        public Node Parent { get; set; }
-
-        public abstract bool IsRedundant();
-        public string PrettyPrint()
-        {
-            return PrettyPrint(0);
-        }
-        public abstract string PrettyPrint(int indentLevel);
-
-    }
-
-    public class TerminalNode : Node
-    {
-        public object Result { get; set; }
-
-        public override bool IsRedundant()
-        {
-            return false;
-        }
-
-        public override string PrettyPrint(int indentLevel)
-        {
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < indentLevel; i++)
-            {
-                sb.Append("  ");
-            }
-            sb.Append($"T: {Result}\n");
-            return sb.ToString();
-        }
-    }
-
-    public class BranchNode : Node
-    {
-        /// <summary>
-        /// construct a branch node with details about what symbol should be checked 
-        /// and what paths different classifications of data will result in.
-        /// </summary>
-        /// <param name="symbol">what symbol the prevailing test data was classified on</param>
-        /// <param name="ParentNode">the parent node if any out of which this node represents a branch</param>
-        public BranchNode( SymbolTableEntry symbol, 
-            Node parentNode)
-        {
-            this.Parent = parentNode;
-            this.Symbol = symbol;
-        }
-
-        public int SymbolId { get { return Symbol.Id; } }
-        public SymbolTableEntry Symbol { get; set; }
-        /// <summary>
-        /// collection of outgoing branches, each of which corresponds to some AttributeClassicationInstance
-        /// </summary>
-        Dictionary<AttributePermissibleValue, Node> branches = new Dictionary<AttributePermissibleValue, Node>();
-        public Dictionary<AttributePermissibleValue, Node> Branches
-        {
-            get { return branches; }
-            set { branches = value; }
-        }
-
-        private Node node;
-        public BranchNode(Node node)
-        {
-            this.node = node;
-        }
-
-        /// <summary>
-        /// returns true if all branches point to the same node instance.
-        /// </summary>
-        /// <returns></returns>
-        public override bool IsRedundant()
-        {
-            var first = branches.Values.First();
-            return Enumerable.All(branches.Values.Skip(1), x => x.Equals(first));
-        }
-
-        public override string PrettyPrint(int indentLevel)
-        {
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < indentLevel; i++)
-            {
-                sb.Append("  ");
-            }
-
-            sb.Append($"B: {Symbol.Name}\n");
-            foreach (var b in branches)
-            {
-                var lbl = $"[{b.Key.ClassName}] -> {b.Value.PrettyPrint(++indentLevel)}";
-                sb.Append(lbl);
-            }
-            return sb.ToString();
-        }
-
     }
 }

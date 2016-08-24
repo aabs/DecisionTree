@@ -17,8 +17,11 @@ namespace bdd_tests
 
         [TestMethod]
         public void TestCanAddSymbolToTable() {
-            var st = new SymbolTable();
+            var stb = new SymbolTableBuilder();
+            var st = stb.Build();
             // symbols are declared on first mention...
+            st.GetSymbolId("a").Should().NotHaveValue();
+            st.DeclareBooleanVariable("a");
             st.GetSymbolId("a").Should().HaveValue();
         }
 

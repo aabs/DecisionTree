@@ -8,7 +8,7 @@ namespace bdd
 {
     public static class UtilityFunctions
     {
-        public static string ConvertAttributeNameToColumnName(string name)
+        public static string ConvertAttributeNameToColumnName_Ignore(string name)
         {
             return name.Replace(' ', '_')
                 .Replace('\'', '_')

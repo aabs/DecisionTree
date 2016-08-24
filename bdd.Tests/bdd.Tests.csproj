@@ -49,22 +49,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BranchNodeTest.BranchesGetTest.g.cs">
-      <DependentUpon>BranchNodeTest.cs</DependentUpon>
-    </Compile>
-    <Compile Include="BranchNodeTest.BranchesSetTest.g.cs">
-      <DependentUpon>BranchNodeTest.cs</DependentUpon>
-    </Compile>
-    <Compile Include="BranchNodeTest.ConstructorTest.g.cs">
-      <DependentUpon>BranchNodeTest.cs</DependentUpon>
-    </Compile>
-    <Compile Include="BranchNodeTest.ConstructorTest01.g.cs">
-      <DependentUpon>BranchNodeTest.cs</DependentUpon>
-    </Compile>
-    <Compile Include="BranchNodeTest.cs" />
-    <Compile Include="BranchNodeTest.SymbolIdGetTest.g.cs">
-      <DependentUpon>BranchNodeTest.cs</DependentUpon>
-    </Compile>
     <Compile Include="DecisionTreeTest.CreateNodeTest.g.cs">
       <DependentUpon>DecisionTreeTest.cs</DependentUpon>
     </Compile>
