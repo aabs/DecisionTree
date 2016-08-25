@@ -80,6 +80,22 @@ namespace bdd_tests
             var sut = new TreeBuilder(testDataCsvFile);
             var dt = sut.CreateTree();
             EvaluatesAllTestDataCorrectly(sut, dt);
+
+            // first count the number of vertices
+            var ev3 = new VertexCounter(dt);
+            ev3.Visit(dt.Tree.Root);
+            Debug.WriteLine($"Vertices: {ev3.Counter}");
+
+            // now normalise the tree
+            var ev2 = new NormaliserSimplifier(dt, "Unmatched");
+            ev2.Visit(dt.Tree.Root);
+
+            // now count them again. (should be larger)
+            ev3.Reset();
+            ev3.Visit(dt.Tree.Root);
+            Debug.WriteLine($"Vertices: {ev3.Counter}");
+
+            // now start to simplify
             var evaluator = new RecursiveSimplifier(dt);
             evaluator.Visit(dt.Tree.Root);
             var dt2 = new DecisionTree<BaseDtVertexType, DtBranchTest>
@@ -89,6 +105,11 @@ namespace bdd_tests
                     Root = evaluator.SimplifiedTree
                 }
             };
+
+            // now count vertices in the simplified tree
+            ev3.Reset();
+            ev3.Visit(dt2.Tree.Root);
+            Debug.WriteLine($"Vertices: {ev3.Counter}");
             EvaluatesAllTestDataCorrectly(sut, dt2);
         }
     }

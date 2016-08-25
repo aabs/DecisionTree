@@ -32,8 +32,9 @@ namespace bdd
             }
         }
 
-        public virtual void Visit(Edge<BaseDtVertexType, DtBranchTest> n)
+        public virtual void Visit(Edge<BaseDtVertexType, DtBranchTest> e)
         {
+            Visit(e.TargetVertex);
         }
     }
 

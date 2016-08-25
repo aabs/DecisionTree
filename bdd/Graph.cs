@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace bdd
@@ -36,6 +37,7 @@ namespace bdd
         }
     }
 
+    [DebuggerDisplay("V:{Content.ToString()}({children.Count})")]
     public class Vertex<TVertexType, TEdgeLabelType> : IEquatable<Vertex<TVertexType, TEdgeLabelType>>
         where TVertexType : IEquatable<TVertexType>
         where TEdgeLabelType : IEquatable<TEdgeLabelType>
@@ -126,6 +128,7 @@ namespace bdd
         }
     }
 
+    [DebuggerDisplay("E:{Label.ToString()} {TargetVertex.ToString()}")]
     public class Edge<TVertexType, TEdgeLabelType> : IEquatable<Edge<TVertexType, TEdgeLabelType>>
         where TVertexType : IEquatable<TVertexType>
         where TEdgeLabelType : IEquatable<TEdgeLabelType>

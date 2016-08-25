@@ -4,6 +4,7 @@ using System.Linq;
 using System.Diagnostics.Contracts;
 using System.Threading.Tasks;
 using System.Text;
+using System.Diagnostics;
 
 namespace bdd
 {
@@ -12,6 +13,7 @@ namespace bdd
         public bool Equals(BaseDtVertexType other) { return false; }
     }
 
+    [DebuggerDisplay("{ToString()}")]
     public class DtTest : BaseDtVertexType, IEquatable<DtTest>
     {
         public DtTest(DecisionSpaceAttribute attribute)
@@ -29,8 +31,14 @@ namespace bdd
         {
             return Attribute.Equals(other.Attribute);
         }
+
+        public override string ToString()
+        {
+            return $"Test:{Attribute.Name}";
+        }
     }
 
+    [DebuggerDisplay("{ToString()}")]
     public class DtOutcome : BaseDtVertexType, IEquatable<DtOutcome>
     {
         public DtOutcome(string outcome)
@@ -59,8 +67,13 @@ namespace bdd
             }
             return OutcomeValue.Equals(other.OutcomeValue);
         }
+        public override string ToString()
+        {
+            return $"Outcome:{OutcomeValue}";
+        }
     }
 
+    [DebuggerDisplay("{ToString()}")]
     public class DtBranchTest : IEquatable<DtBranchTest>
     {
         public AttributePermissibleValue TestValue { get; set; }
@@ -71,6 +84,10 @@ namespace bdd
         public bool Equals(DtBranchTest other)
         {
             return TestValue.Equals(other.TestValue);
+        }
+        public override string ToString()
+        {
+            return $"BranchTest:({TestValue.ClassName}: {TestValue.Value})";
         }
     }
 }
