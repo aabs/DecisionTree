@@ -6,53 +6,148 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace bdd_ignore
+namespace bdd
 {
-    using DtNode = Edge<BaseDtVertexType, DtBranchTest>;
-    public class EvaluatorVisitor : BaseVisitor<BaseDtVertexType, DtBranchTest>, IVisitor<BaseDtVertexType, DtBranchTest>
+    using DT = DecisionTree<BaseDtVertexType, DtBranchTest>;
+    using TV = Vertex<BaseDtVertexType, DtBranchTest>;
+    using TE = Edge<BaseDtVertexType, DtBranchTest>;
+    public class EvaluatorVisitor : VisitorSupertype
     {
-        public EvaluatorVisitor(DecisionTree<BaseDtVertexType, DtBranchTest> dt, bdd.Environment environment):base(dt)
+        public EvaluatorVisitor(DT dt,
+            Environment environment) : base(dt)
         {
-            EvaluatedResult = null;
+            this.EvaluatedResult = null;
             this.Environment = environment;
         }
 
-        public bdd.Environment Environment { get; private set; }
+        public Environment Environment { get; private set; }
         public string EvaluatedResult { get; set; }
-        public override bool StartVisit(DtNode n)
+
+        public new void Visit(TE e)
         {
-            // keep drilling down until we get a result from an outcome
-            if (EvaluatedResult == null)
+            if (EvaluatedResult != null)
             {
-                return true;
+                return;
             }
-            // if we haven't found a match yet, then look at the link to see if the 
-            // test value matches the bound variable in the environment.
-            // is the link we're on a match with the variable in the environment?  
-            // If so, then visit that, but not the others
-            if (n.OriginVertex.Content is DtTest)
+            Visit(e.TargetVertex);
+        }
+        public new void Visit(Vertex<BaseDtVertexType, DtBranchTest> v)
+        {
+            if (EvaluatedResult != null)
             {
-                var x = n.OriginVertex.Content as DtTest;
+                return;
+            }
+            // if the vertex is an outcome then take it, otherwise navigate allong the matching edge
+            if (v.Content is DtOutcome)
+            {
+                EvaluatedResult = ((DtOutcome)v.Content).OutcomeValue;
+                return;
+            }
+            if (v.Content is DtTest)
+            {
+                var x = v.Content as DtTest;
                 var testValue = Environment.Resolve(x.Attribute);
-                return testValue.Equals(n.Label.TestValue.Value);
+                foreach (var c in v.Children)
+                {
+                    var lblVal = c.Label.TestValue.Value;
+                    if (testValue == (string)lblVal)
+                    {
+                        Visit(c);
+                        return;
+                    }
+                }
+                EvaluatedResult = CalculateDefaultResponse();
+                return;
             }
-            // After a result has been found, then stop looking for a result
-            return false;
         }
 
-        public override void Visit(DtNode n)
+        private string CalculateDefaultResponse()
         {
-            if (n.TargetVertex.Content is DtOutcome)
-            {
-                EvaluatedResult = ((DtOutcome)n.TargetVertex.Content).OutcomeValue;
-            }
+            return "default";
         }
     }
 
-    public class PrettyPrinter : BaseVisitor<BaseDtVertexType, DtBranchTest>, IVisitor<BaseDtVertexType, DtBranchTest>
+    public class PrettyPrinter : VisitorSupertype
     {
-        public PrettyPrinter(DecisionTree<BaseDtVertexType, DtBranchTest> dt) : base(dt)
+        public PrettyPrinter(DT dt) : base(dt)
         {
+        }
+    }
+
+    public class RecursiveSimplifier : VisitorSupertype
+    {
+        public RecursiveSimplifier(DT dt) : base(dt)
+        {
+        }
+
+        new void Visit(TE n)
+        {
+
+        }
+
+        new void Visit(TV v)
+        {
+
+        }
+
+        TV Simplify(TV v)
+        {
+            // if it's an outcome there is no sub structure or simplifications possible
+            // so just duplicate and return.
+            if (v.Content is DtOutcome)
+            {
+                return Duplicate(v);
+            }
+
+            // if not, then it must have children.
+
+
+            var children = from c in v.Children
+                           select Simplify(c);
+
+            // if all children are the same (whether leaves or trees) then
+            // v can be replaced with any one of the children. All of the rest
+            // of the children, plus v, can be thrown away (V is an element from 
+            // the original tree being simplified, so it probably won't be disposed right away
+            // but at least it won't make it into the new simplified tree.
+            if (children.AllIdentical())
+            {
+                return children.First().TargetVertex;
+            }
+
+
+            //  if we get to this point, then there are no simplifications possible, so just return a duplicate of the tree.
+            return Duplicate(v, children);
+        }
+
+        TE Simplify(TE e)
+        {
+            // edges cannot be simplified, but to support a cleaner form of recursive simplification,
+            // let's pretend they can...
+            return new TE(
+                new DtBranchTest(new AttributePermissibleValue { ClassName = e.Label.TestValue.ClassName, Value = e.Label.TestValue.Value }),
+                Simplify(e.TargetVertex)
+                );
+        }
+
+        TV Duplicate(TV v, IEnumerable<TE> newChildren)
+        {
+        }
+
+        TV Duplicate(TV v, IEnumerable<TE> newChildren)
+        {
+            // assumption is that no simplifications were possible for v, so a straight copy is all that is required.
+            // all of the children will have been duplicated in attempting to simplify them, so no need to repeat the process.
+            return new TV
+            throw new NotImplementedException();
+        }
+
+        TE Duplicate(TE e)
+        {
+            return new TE(
+                new DtBranchTest(new AttributePermissibleValue { ClassName = e.Label.TestValue.ClassName, Value = e.Label.TestValue.Value }),
+                Duplicate(e.TargetVertex)
+                );
         }
     }
 }

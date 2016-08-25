@@ -36,7 +36,7 @@ namespace bdd
         }
     }
 
-    public class Vertex<TVertexType, TEdgeLabelType>
+    public class Vertex<TVertexType, TEdgeLabelType> : IEquatable<Vertex<TVertexType, TEdgeLabelType>>
         where TVertexType : IEquatable<TVertexType>
         where TEdgeLabelType : IEquatable<TEdgeLabelType>
     {
@@ -103,6 +103,11 @@ namespace bdd
             }
         }
 
+        public bool Equals(Vertex<TVertexType, TEdgeLabelType> other)
+        {
+            return EquivalentTo(other);
+        }
+
         public TVertexType this[TEdgeLabelType index]
         {
             get
@@ -120,7 +125,7 @@ namespace bdd
         }
     }
 
-    public class Edge<TVertexType, TEdgeLabelType>
+    public class Edge<TVertexType, TEdgeLabelType> : IEquatable<Edge<TVertexType, TEdgeLabelType>>
         where TVertexType : IEquatable<TVertexType>
         where TEdgeLabelType : IEquatable<TEdgeLabelType>
     {
@@ -138,5 +143,11 @@ namespace bdd
         public TEdgeLabelType Label { get; set; }
         public Vertex<TVertexType, TEdgeLabelType> OriginVertex { get; internal set; }
         public Vertex<TVertexType, TEdgeLabelType> TargetVertex { get; set; }
+
+        public bool Equals(Edge<TVertexType, TEdgeLabelType> other)
+        {
+            return Label.Equals(other.Label) &&
+                TargetVertex.Equals(other.TargetVertex);
+        }
     }
 }

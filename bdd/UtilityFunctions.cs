@@ -15,5 +15,15 @@ namespace bdd
                 .Replace('\"', '_')
                 .Replace('\t', '_');
         }
+
+        public static bool AllIdentical<T>(this IEnumerable<T> seq)
+            where T : IEquatable<T>
+        {
+            // degenerate case
+            if (seq.Count() < 2)
+                return true;
+            var first = seq.First();
+            return seq.Skip(1).All(x => x.Equals(first));
+        }
     }
 }
