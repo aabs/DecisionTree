@@ -82,7 +82,7 @@ namespace bdd_tests
             EvaluatesAllTestDataCorrectly(sut, dt);
 
             // first count the number of vertices
-            var ev3 = new VertexCounter(dt);
+            var ev3 = new VertexCounterVisitor(dt);
             ev3.Visit(dt.Tree.Root);
             Debug.WriteLine($"Vertices: {ev3.Counter}");
 
