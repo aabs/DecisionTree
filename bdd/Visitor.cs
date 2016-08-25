@@ -24,7 +24,7 @@ namespace bdd
             this.dt = dt;
         }
 
-        public void Visit(Vertex<BaseDtVertexType, DtBranchTest> v)
+        public virtual void Visit(Vertex<BaseDtVertexType, DtBranchTest> v)
         {
             foreach (var c in v.Children)
             {
@@ -32,7 +32,7 @@ namespace bdd
             }
         }
 
-        public void Visit(Edge<BaseDtVertexType, DtBranchTest> n)
+        public virtual void Visit(Edge<BaseDtVertexType, DtBranchTest> n)
         {
         }
     }

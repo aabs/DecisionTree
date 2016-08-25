@@ -76,18 +76,20 @@ namespace bdd
 
     public class RecursiveSimplifier : VisitorSupertype
     {
+        public TE SimplifiedTree { get; set; }
+
         public RecursiveSimplifier(DT dt) : base(dt)
         {
         }
 
-        new void Visit(TE n)
+        public override void Visit(TE e)
         {
-
+            SimplifiedTree = Simplify(e);
         }
 
-        new void Visit(TV v)
+        public override void Visit(TV v)
         {
-
+            throw new NotImplementedException();
         }
 
         TV Simplify(TV v)
@@ -124,22 +126,48 @@ namespace bdd
         {
             // edges cannot be simplified, but to support a cleaner form of recursive simplification,
             // let's pretend they can...
+            var x = e.Label.TestValue == null ? new DtBranchTest(null) : new DtBranchTest(new AttributePermissibleValue { ClassName = e.Label.TestValue.ClassName, Value = e.Label.TestValue.Value });
             return new TE(
-                new DtBranchTest(new AttributePermissibleValue { ClassName = e.Label.TestValue.ClassName, Value = e.Label.TestValue.Value }),
+                x,
                 Simplify(e.TargetVertex)
                 );
         }
 
-        TV Duplicate(TV v, IEnumerable<TE> newChildren)
+        TV Duplicate(TV v)
         {
+            var cs = from c in v.Children
+                     select Duplicate(c);
+            return Duplicate(v, cs);
         }
 
         TV Duplicate(TV v, IEnumerable<TE> newChildren)
         {
             // assumption is that no simplifications were possible for v, so a straight copy is all that is required.
             // all of the children will have been duplicated in attempting to simplify them, so no need to repeat the process.
-            return new TV
-            throw new NotImplementedException();
+            BaseDtVertexType contents = null;
+
+            if (v.Content is DtOutcome)
+            {
+                var x = v.Content as DtOutcome;
+                contents = new DtOutcome(x.OutcomeValue);
+            }
+            if (v.Content is DtTest)
+            {
+                var y = v.Content as DtTest;
+                contents = new DtTest(new DecisionSpaceAttribute
+                {
+                    Classes = (from dc in y.Attribute.Classes select new DataClass {Id = dc.Id, Name = dc.Name }).ToList(),
+                    DataType = y.Attribute.DataType,
+                    Name = y.Attribute.Name
+                });
+            }
+            var result = new TV(contents);
+            foreach (var c in newChildren)
+            {
+                result.AddChild(c);
+            }
+
+            return result;
         }
 
         TE Duplicate(TE e)

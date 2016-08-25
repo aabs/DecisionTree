@@ -60,6 +60,7 @@ namespace bdd
         public Vertex<TVertexType, TEdgeLabelType> AddChild(Edge<TVertexType, TEdgeLabelType> e)
         {
             children.Add(e);
+            // consider wiring up parent vertex propr at this point
             return this;
         }
 

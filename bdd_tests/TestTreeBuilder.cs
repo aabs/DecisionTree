@@ -32,6 +32,11 @@ namespace bdd_tests
             var sut = new TreeBuilder(testDataCsvFile);
             var dt = sut.CreateTree();
 
+            EvaluatesAllTestDataCorrectly(sut, dt);
+        }
+
+        private void EvaluatesAllTestDataCorrectly(TreeBuilder sut, DecisionTree<BaseDtVertexType, DtBranchTest> dt)
+        {
             int correct = 0, total = 0;
 
             foreach (DataRow row in sut.SymbolTable.DecisionMetadata.AllSamples)
@@ -67,6 +72,24 @@ namespace bdd_tests
                 env.Bind(attr.Name, row.Field<string>(colName));
             }
             return env;
+        }
+
+        [TestMethod]
+        public void CanSimplifyTree()
+        {
+            var sut = new TreeBuilder(testDataCsvFile);
+            var dt = sut.CreateTree();
+            EvaluatesAllTestDataCorrectly(sut, dt);
+            var evaluator = new RecursiveSimplifier(dt);
+            evaluator.Visit(dt.Tree.Root);
+            var dt2 = new DecisionTree<BaseDtVertexType, DtBranchTest>
+            {
+                Tree = new Graph<BaseDtVertexType, DtBranchTest>
+                {
+                    Root = evaluator.SimplifiedTree
+                }
+            };
+            EvaluatesAllTestDataCorrectly(sut, dt2);
         }
     }
 }
