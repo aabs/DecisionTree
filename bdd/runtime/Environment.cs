@@ -4,12 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace bdd
+namespace DecisionDiagrams
 {
     public class Environment
     {
         public SymbolTable SymbolTable { get; private set; }
-        Dictionary<int, string> boundVariables = new Dictionary<int, string>();
+
+        readonly Dictionary<int, string> boundVariables = new Dictionary<int, string>();
         public Environment ParentEnvironment { get; set; }
         public bool SingleAssignment { get; private set; }
 
@@ -62,7 +63,7 @@ namespace bdd
             }
             throw new DecisionException("Unresolved symbol");
         }
-        public string Resolve(DecisionSpaceAttribute attr)
+        public string Resolve(Attribute attr)
         {
             var id = SymbolTable.GetSymbolId(attr.Name);
             if (id.HasValue)

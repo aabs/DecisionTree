@@ -1,14 +1,14 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using bdd;
+﻿using NUnit.Framework;
+using DecisionDiagrams;
 using FluentAssertions;
 using System.Collections.Generic;
 
 namespace bdd_tests
 {
-    [TestClass]
+    [TestFixture]
     public class TestDecisionTreeOptimiser
     {
-        [TestMethod]
+        [Test]
         public void CanDetectRedundantBranchNodes()
         {
             //var st = new SymbolTable();

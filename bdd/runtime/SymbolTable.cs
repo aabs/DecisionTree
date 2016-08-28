@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace bdd
+namespace DecisionDiagrams
 {
     public class SymbolTableEntry
     {
@@ -48,7 +48,7 @@ namespace bdd
 
         Dictionary<string, SymbolTableEntry> symbols = new Dictionary<string, SymbolTableEntry>();
 
-        public SymbolTable(Decision d)
+        public SymbolTable(DecisionMetadata d)
         {
             this.DecisionMetadata = d;
         }
@@ -57,7 +57,7 @@ namespace bdd
         {
         }
 
-        public Decision DecisionMetadata { get; internal set; }
+        public DecisionMetadata DecisionMetadata { get; internal set; }
 
         public Dictionary<string, SymbolTableEntry> Symbols
         {
@@ -112,7 +112,7 @@ namespace bdd
             return newEntry.Id;
         }
 
-        internal int DeclareEnumeratedVariable(string variableName, Dictionary<string, int> vals)
+        internal int DeclareEnumeratedVariable(string variableName, List<PossibleValue> vals)
         {
             if (Symbols.ContainsKey(variableName))
             {
@@ -123,7 +123,7 @@ namespace bdd
                 Id = nextId++,
                 Name = variableName,
                 AttributeType = typeof(int),
-                PermittedValues = vals.Select(p => new AttributePermissibleValue { ClassName = p.Key, Value = p.Value }).ToList()
+                PermittedValues = vals.Select(p => new AttributePermissibleValue { ClassName = p.Value, Value = p.Value }).ToList()
             };
             Symbols[newEntry.Name] = newEntry;
             return newEntry.Id;
@@ -146,7 +146,7 @@ namespace bdd
 
     public class SymbolTableBuilder
     {
-        Decision d = null;
+        DecisionMetadata d;
         Dictionary<string, string[]> symbols = new Dictionary<string, string[]>();
         public SymbolTableBuilder WithSymbol(string name, params string[] vals)
         {
@@ -154,7 +154,7 @@ namespace bdd
             return this;
         }
 
-        public SymbolTableBuilder WithMetadata(Decision d)
+        public SymbolTableBuilder WithMetadata(DecisionMetadata d)
         {
             this.d = d;
             return this;

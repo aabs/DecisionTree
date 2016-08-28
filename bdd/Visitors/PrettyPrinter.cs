@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace bdd
+namespace DecisionDiagrams
 {
     using DT = DecisionTree<BaseDtVertexType, DtBranchTest>;
     using TE = Edge<BaseDtVertexType, DtBranchTest>;

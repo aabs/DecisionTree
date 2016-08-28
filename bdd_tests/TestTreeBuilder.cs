@@ -1,35 +1,40 @@
 ﻿
-using bdd;
+using DecisionDiagrams;
 using FluentAssertions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using System.Data;
 using System.Diagnostics;
+using System;
 
 namespace bdd_tests
 {
-    [TestClass]
+    [TestFixture]
     public class TestTreeBuilder
     {
-        private const string testDataCsvFile = @"..\..\..\testdata\problem-metadata.xml";
 
-        [TestMethod]
+        [Test]
         public void CanCreateTreeBuilder()
         {
-            var sut = new TreeBuilder(testDataCsvFile);
+            var sut = new TreeBuilder(GetMetadataPath());
             sut.Should().NotBeNull();
         }
 
-        [TestMethod]
+        private string GetMetadataPath()
+        {
+            return System.Environment.GetEnvironmentVariable("BDD_TEST_DATA_DIR") ?? @"C:\dev\binarydecisiontree\bdd_tests\testdata\problem-metadata.xml";
+        }
+
+        [Test]
         public void CanRunTreeBuilder()
         {
-            var sut = new TreeBuilder(testDataCsvFile);
+            var sut = new TreeBuilder(GetMetadataPath());
             var dt = sut.CreateTree();
         }
 
-        [TestMethod]
+        [Test]
         public void CanEvaluateTree()
         {
-            var sut = new TreeBuilder(testDataCsvFile);
+            var sut = new TreeBuilder(GetMetadataPath());
             var dt = sut.CreateTree();
 
             EvaluatesAllTestDataCorrectly(sut, dt);
@@ -63,9 +68,9 @@ namespace bdd_tests
             correct.Should().Be(total);
         }
 
-        private bdd.Environment RowToEnv(SymbolTable st, DataRow row)
+        private DecisionDiagrams.Environment RowToEnv(SymbolTable st, DataRow row)
         {
-            var env = new bdd.Environment(st);
+            var env = new DecisionDiagrams.Environment(st);
             foreach (var attr in st.DecisionMetadata.Attributes)
             {
                 var colName = attr.Name;
@@ -74,29 +79,32 @@ namespace bdd_tests
             return env;
         }
 
-        [TestMethod]
+        [Test]
         public void CanSimplifyTree()
         {
-            var sut = new TreeBuilder(testDataCsvFile);
+            var sut = new TreeBuilder(GetMetadataPath());
             var dt = sut.CreateTree();
             EvaluatesAllTestDataCorrectly(sut, dt);
 
             // first count the number of vertices
-            var ev3 = new VertexCounterVisitor(dt);
-            ev3.Visit(dt.Tree.Root);
-            Debug.WriteLine($"Vertices: {ev3.Counter}");
+            var vertexCounter = new VertexCounterVisitor(dt);
+            vertexCounter.Visit(dt.Tree.Root);
+            var initialVertexCount = vertexCounter.Counter;
+            Debug.WriteLine($"Vertices: {initialVertexCount}");
 
             // now normalise the tree
-            var ev2 = new NormaliserSimplifier(dt, "Unmatched");
-            ev2.Visit(dt.Tree.Root);
+            var normaliser = new NormaliserSimplifier(dt, "Unmatched");
+            normaliser.Visit(dt.Tree.Root);
 
             // now count them again. (should be larger)
-            ev3.Reset();
-            ev3.Visit(dt.Tree.Root);
-            Debug.WriteLine($"Vertices: {ev3.Counter}");
-
+            vertexCounter.Reset();
+            vertexCounter.Visit(dt.Tree.Root);
+            var normalisedVertexCount = vertexCounter.Counter;
+            Debug.WriteLine($"Vertices: {normalisedVertexCount}");
+            normalisedVertexCount.Should().BeGreaterThan(initialVertexCount);
+            
             // now start to simplify
-            var evaluator = new RecursiveSimplifier(dt);
+            var evaluator = new BryantReducer(dt);
             evaluator.Visit(dt.Tree.Root);
             var dt2 = new DecisionTree<BaseDtVertexType, DtBranchTest>
             {
@@ -107,9 +115,13 @@ namespace bdd_tests
             };
 
             // now count vertices in the simplified tree
-            ev3.Reset();
-            ev3.Visit(dt2.Tree.Root);
-            Debug.WriteLine($"Vertices: {ev3.Counter}");
+            vertexCounter.Reset();
+            vertexCounter.Visit(dt2.Tree.Root);
+            var simplifiedVertexCount = vertexCounter.Counter;
+            Debug.WriteLine($"Vertices: {simplifiedVertexCount}");
+            simplifiedVertexCount.Should().BeLessThan(normalisedVertexCount);
+
+            // check that the modified DT still works OK.
             EvaluatesAllTestDataCorrectly(sut, dt2);
         }
     }

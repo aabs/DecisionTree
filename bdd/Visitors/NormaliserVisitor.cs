@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace bdd
+namespace DecisionDiagrams
 {
     using DT = DecisionTree<BaseDtVertexType, DtBranchTest>;
     using TE = Edge<BaseDtVertexType, DtBranchTest>;
@@ -39,15 +39,15 @@ namespace bdd
                 // for each of the permissible outcomes of the variable being tested by this vertex,
                 // check that the vertex has a child for that outcome.  If it doesn't, then
                 // create a default outcome for any missing outcomes.
-                foreach (var dc in t.Attribute.Classes)
+                foreach (var dc in t.Attribute.PossibleValues)
                 {
                     // if none of the children of this vertex has a label corresponding to the
                     // data class dc, then create a default outcome
-                    if (!v.Children.Any(te => dc.Name == (string)te.Label.TestValue.Value))
+                    if (!v.Children.Any(te => dc.Value == (string)te.Label.TestValue.Value))
                     {
                         v.AddChild(
                             new DtOutcome(DefaultOutcome),
-                            new DtBranchTest(new AttributePermissibleValue { ClassName = dc.Name, Value = dc.Name })
+                            new DtBranchTest(new AttributePermissibleValue { ClassName = dc.Value, Value = dc.Value })
                             );
                     }
                 }

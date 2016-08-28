@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace bdd
+namespace DecisionDiagrams
 {
     [Serializable]
     public class DecisionException : ApplicationException

@@ -2,17 +2,16 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 
-namespace bdd
+namespace DecisionDiagrams
 {
     using DecisionTree = DecisionTree<BaseDtVertexType, DtBranchTest>;
+
     public class TreeBuilder
     {
-
         public TreeBuilder(string metadataFileLocation)
         {
             var doc = XDocument.Load(metadataFileLocation);
@@ -20,11 +19,12 @@ namespace bdd
         }
 
         #region Configuration Loading
+
         public SymbolTable SymbolTable { get; private set; }
 
         private SymbolTable LoadConfig(XElement root)
         {
-            var metadata = new Decision
+            var metadata = new DecisionMetadata
             {
                 SampleDataLocation = root.Element("SampleData").Value,
                 Outcomes = LoadOutcomes(root),
@@ -33,54 +33,54 @@ namespace bdd
             return BuildSymbolTable(metadata);
         }
 
-        private SymbolTable BuildSymbolTable(Decision d)
+        private SymbolTable BuildSymbolTable(DecisionMetadata d)
         {
             var result = new SymbolTable(d);
 
             foreach (var attr in d.Attributes)
             {
-                if (attr.DataType == "Enumerated")
+                if (attr.KindOfData == "Enumerated")
                 {
-                    var vals = attr.Classes.ToDictionary(c => c.Name, c => c.Id);
-                    result.DeclareEnumeratedVariable(attr.Name, vals);
+                    var vals = attr.PossibleValues.ToDictionary(c => c.Value);
+                    result.DeclareEnumeratedVariable(attr.Name, attr.PossibleValues);
                 }
             }
             return result;
         }
 
-        private List<DecisionSpaceAttribute> LoadAttributes(XElement root)
+        private List<Attribute> LoadAttributes(XElement root)
         {
             return (from a in root.Descendants("Attribute")
-                    select new DecisionSpaceAttribute
+                    select new Attribute
                     {
                         Name = a.Element("Name").Value,
-                        DataType = a.Element("Type").Value,
-                        Classes = (from c in a.Descendants("Class")
-                                   select new DataClass
+                        KindOfData = a.Element("Type").Value,
+                        PossibleValues = (from c in a.Descendants("Class")
+                                   select new PossibleValue
                                    {
-                                       Id = int.Parse(c.Element("Id").Value),
-                                       Name = c.Element("Name").Value
+                                       Value = c.Element("Name").Value
                                    }).ToList()
                     }).ToList();
         }
 
-        private Outcomes LoadOutcomes(XElement root)
+        private DecisionOutcomes LoadOutcomes(XElement root)
         {
             var outcomesElement = root.Element("Outcomes");
             var vals = from o in outcomesElement.Descendants("Value")
-                       select new Outcome
+                       select new DecisionOutcome
                        {
                            Id = int.Parse(o.Element("Id").Value),
                            Name = o.Element("Name").Value
                        };
-            return new Outcomes
+            return new DecisionOutcomes
             {
                 OutcomeType = outcomesElement.Element("Type").Value,
-                OutcomeColumn = outcomesElement.Element("Column").Value,
+                OutcomeColumnNameInSampleData = outcomesElement.Element("Column").Value,
                 Values = vals.ToList()
             };
         }
-        #endregion
+
+        #endregion Configuration Loading
 
         public DecisionTree CreateTree()
         {
@@ -101,7 +101,7 @@ namespace bdd
         }
 
         public Vertex<BaseDtVertexType, DtBranchTest> CreateTree(IEnumerable<DataRow> examples,
-            IEnumerable<DecisionSpaceAttribute> attributes)
+            IEnumerable<Attribute> attributes)
         {
             // 0. if all samples have same outcome create terminal node with that outcome
             foreach (var o in SymbolTable.DecisionMetadata.Outcomes.Values)
@@ -117,7 +117,7 @@ namespace bdd
             var attr = GetDominatingAttribute(examples, attributes);
             var result = new Vertex<BaseDtVertexType, DtBranchTest>(new DtTest(attr));
             // 2. for each class under that attribute
-            foreach (DataClass cls in attr.Classes)
+            foreach (PossibleValue cls in attr.PossibleValues)
             {
                 // 2.1. if samples contain instances with that value of the attribute,
                 if (SamplesContainInstanceWithAttributeInClass(examples, attr, cls))
@@ -127,7 +127,7 @@ namespace bdd
                     var filteredExamples = FilterExamplesToSubclassOfAttribute(examples, attr, cls);
                     //       with the attribute list filtered to remove the attribute
                     var filteredAttributes = attributes.Except(new[] { attr });
-                    var edgeLabel = new AttributePermissibleValue { ClassName = cls.Name, Value = cls.Name };
+                    var edgeLabel = new AttributePermissibleValue { ClassName = cls.Value, Value = cls.Value };
                     var targetVertex = CreateTree(filteredExamples, filteredAttributes);
                     var branch = new DtBranchTest(edgeLabel);
                     var edge = new Edge<BaseDtVertexType, DtBranchTest>(branch, targetVertex);
@@ -138,27 +138,27 @@ namespace bdd
             return result;
         }
 
-        private IEnumerable<DataRow> FilterExamplesToSubclassOfAttribute(IEnumerable<DataRow> examples, DecisionSpaceAttribute attr, DataClass cls)
+        private IEnumerable<DataRow> FilterExamplesToSubclassOfAttribute(IEnumerable<DataRow> examples, Attribute attr, PossibleValue cls)
         {
             var col = attr.Name;
-            return examples.Where(e => e.Field<string>(col) == cls.Name);
+            return examples.Where(e => e.Field<string>(col) == cls.Value);
         }
 
-        private SymbolTableEntry GetSymbolTableEntryFromAttribute(DecisionSpaceAttribute attr)
+        private SymbolTableEntry GetSymbolTableEntryFromAttribute(Attribute attr)
         {
             return SymbolTable.GetEntry(attr.Name);
         }
 
-        private bool SamplesContainInstanceWithAttributeInClass(IEnumerable<DataRow> examples, DecisionSpaceAttribute attr, DataClass cls)
+        private bool SamplesContainInstanceWithAttributeInClass(IEnumerable<DataRow> examples, Attribute attr, PossibleValue cls)
         {
             var col = attr.Name;
-            return examples.Any(dr => dr.Field<string>(col) == cls.Name);
+            return examples.Any(dr => dr.Field<string>(col) == cls.Value);
         }
 
-        DecisionSpaceAttribute GetDominatingAttribute(IEnumerable<DataRow> examples,
-            IEnumerable<DecisionSpaceAttribute> attributes)
+        private Attribute GetDominatingAttribute(IEnumerable<DataRow> examples,
+            IEnumerable<Attribute> attributes)
         {
-            var IGs = new Dictionary<DecisionSpaceAttribute, double>();
+            var IGs = new Dictionary<Attribute, double>();
             foreach (var attr in attributes)
             {
                 IGs[attr] = AverageEntropy(examples, attr);
@@ -170,24 +170,23 @@ namespace bdd
                 .FirstOrDefault().Key;
         }
 
-
-        double AverageEntropy(IEnumerable<DataRow> samples, DecisionSpaceAttribute attr)
+        private double AverageEntropy(IEnumerable<DataRow> samples, Attribute attr)
         {
             var attrColName = attr.Name;
 
             var parentClassEntropy = ComputeEntropy(samples);
 
             var informationGain = 0.0;
-            foreach (DataClass cls in attr.Classes)
+            foreach (PossibleValue cls in attr.PossibleValues)
             {
-                var subSamples = samples.Where(dr => dr.Field<string>(attrColName) == cls.Name);
+                var subSamples = samples.Where(dr => dr.Field<string>(attrColName) == cls.Value);
                 var subsetEntropy = ComputeEntropy(subSamples);
                 informationGain -= (subSamples.Count() / (double)samples.Count()) * subsetEntropy;
             }
             return informationGain;
         }
 
-        double ComputeEntropy(IEnumerable<DataRow> samples)
+        private double ComputeEntropy(IEnumerable<DataRow> samples)
         {
             var T = samples.Count();
             var tally = new Dictionary<string, int>();
@@ -209,12 +208,12 @@ namespace bdd
             return -1 * sum;
         }
 
-        bool AllSamplesHaveSameOutcome(IEnumerable<DataRow> samples, Outcome outcome)
+        private bool AllSamplesHaveSameOutcome(IEnumerable<DataRow> samples, DecisionOutcome outcome)
         {
             return samples.All(dr => dr.Field<string>("DecisionOutcome") == outcome.Name);
         }
 
-        DataSet ConvertSampleDataToDataSet(string[][] samples)
+        private DataSet ConvertSampleDataToDataSet(string[][] samples)
         {
             var result = new DataSet();
             var st = result.Tables.Add("Samples");
@@ -224,7 +223,7 @@ namespace bdd
             // first row must contain the column headers (order is not assumed)
             var columnNamesRow = samples[0].ToList();
             st.Columns.Add("DecisionOutcome", typeof(String));
-            var outcomeOrdinal = columnNamesRow.IndexOf(SymbolTable.DecisionMetadata.Outcomes.OutcomeColumn);
+            var outcomeOrdinal = columnNamesRow.IndexOf(SymbolTable.DecisionMetadata.Outcomes.OutcomeColumnNameInSampleData);
 
             foreach (var attr in SymbolTable.DecisionMetadata.Attributes)
             {
@@ -249,6 +248,5 @@ namespace bdd
 
             return result;
         }
-
     }
 }

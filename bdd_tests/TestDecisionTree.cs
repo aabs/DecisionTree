@@ -1,26 +1,26 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using bdd;
+﻿using NUnit.Framework;
+using DecisionDiagrams;
 using FluentAssertions;
 using System.Collections.Generic;
 
 namespace bdd_tests
 {
-    [TestClass]
+    [TestFixture]
     public class TestDecisionTree
     {/*
-        [TestMethod]
+        [Test]
         public void CanCreateNode()
         {
             var sut = new BranchNode_OLD(1, 2, 3, 1);
             sut.Should().NotBeNull();
         }
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(System.ArgumentNullException))]
         public void CannotCreateDTWithNullArgs()
         {
             var sut = new DecisionTree__OLD((Environment)null);
         }
-        [TestMethod]
+        [Test]
         public void CanCreateNodeInDecisionTree()
         {
             var st = new SymbolTable();
@@ -30,7 +30,7 @@ namespace bdd_tests
             sut.GetNode(n.Id).Should().NotBeNull();
         }
 
-        [TestMethod]
+        [Test]
         public void CanCreateFullTree()
         {
             var st = new SymbolTable();
@@ -60,7 +60,7 @@ namespace bdd_tests
             }
         }
 
-        [TestMethod]
+        [Test]
         public void EvaluateBaseCase()
         {
             var env = new Environment(new Dictionary<string, int> { { "a", 0 } });
@@ -69,7 +69,7 @@ namespace bdd_tests
             sut.Evaluate(rootNode.Id).Should().Be(0);
         }
 
-        [TestMethod]
+        [Test]
         public void EvaluateTwoLevelCase()
         {
             var env = new Environment(new Dictionary<string, int> { { "a", 0 }, { "b", 1 } });
@@ -80,7 +80,7 @@ namespace bdd_tests
             sut.Evaluate(rootNode.Id).Should().Be(1);
         }
 
-        [TestMethod]
+        [Test]
         public void EvaluateThreeLevelCase()
         {
             var env = new Environment(new Dictionary<string, int> { { "a", 1 }, { "b", 1 }, { "c", 1 } });

@@ -1,13 +1,13 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using bdd;
+﻿using NUnit.Framework;
+using DecisionDiagrams;
 using FluentAssertions;
 
 namespace bdd_tests
 {
-    [TestClass]
+    [TestFixture]
     public class TestEnvironment
     {
-        [TestMethod]
+        [Test]
         public void TestCanCreateEnvironment()
         {
             var st = new SymbolTable();
@@ -15,7 +15,7 @@ namespace bdd_tests
             sut.Should().NotBeNull();
         }
 
-        [TestMethod]
+        [Test]
         public void TestCanBindVariable()
         {
             var stb = new SymbolTableBuilder().WithSymbol("a", "1", "2", "3");

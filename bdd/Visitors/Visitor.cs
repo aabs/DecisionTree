@@ -1,11 +1,11 @@
-﻿using bdd;
+﻿using DecisionDiagrams;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace bdd
+namespace DecisionDiagrams
 {
     public interface IVisitor<TNodeType, TTestType>
         where TNodeType : IEquatable<TNodeType>

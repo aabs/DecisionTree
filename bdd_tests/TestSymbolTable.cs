@@ -1,21 +1,21 @@
 ﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using bdd;
+using NUnit.Framework;
+using DecisionDiagrams;
 using FluentAssertions;
 
 namespace bdd_tests
 {
-    [TestClass]
+    [TestFixture]
     public class TestSymbolTable
     {
-        [TestMethod]
+        [Test]
         public void TestCanCreateSymbolTable()
         {
             var st = new SymbolTable();
             st.Should().NotBeNull();
         }
 
-        [TestMethod]
+        [Test]
         public void TestCanAddSymbolToTable() {
             var stb = new SymbolTableBuilder();
             var st = stb.Build();
@@ -25,7 +25,7 @@ namespace bdd_tests
             st.GetSymbolId("a").Should().HaveValue();
         }
 
-        [TestMethod]
+        [Test]
         public void TesAddingKnownSymbolToTableCausesException()
         {
             var st = new SymbolTable();
@@ -41,7 +41,7 @@ namespace bdd_tests
             }
         }
 
-        [TestMethod]
+        [Test]
         public void TestAddingMultipleSymbolsIsOK()
         {
             var st = new SymbolTable();

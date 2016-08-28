@@ -7,7 +7,7 @@
     <ProjectGuid>{273B57B6-0448-4D43-87FA-6612DD9D367F}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>bdd</RootNamespace>
+    <RootNamespace>DecisionDiagram</RootNamespace>
     <AssemblyName>bdd</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -45,22 +45,32 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Graph.cs" />
-    <Compile Include="DecisionTree.cs" />
-    <Compile Include="Visitors\EvaluatorVisitor.cs" />
-    <Compile Include="BranchNode.cs" />
-    <Compile Include="Environment.cs" />
+    <Compile Include="tree\BaseDtVertexType.cs" />
+    <Compile Include="tree\DtBranchTest.cs" />
+    <Compile Include="tree\DtOutcome.cs" />
+    <Compile Include="tree\DtTest.cs" />
+    <Compile Include="tree\Edge.cs" />
+    <Compile Include="tree\Graph.cs" />
+    <Compile Include="tree\DecisionTree.cs" />
+    <Compile Include="metadata\PossibleValue.cs" />
+    <Compile Include="metadata\DecisionMetadata.cs" />
+    <Compile Include="metadata\Attribute.cs" />
+    <Compile Include="metadata\Outcome.cs" />
+    <Compile Include="metadata\Outcomes.cs" />
+    <Compile Include="tree\GraphElementSupertype.cs" />
+    <Compile Include="tree\Vertex.cs" />
+    <Compile Include="visitors\EvaluatorVisitor.cs" />
+    <Compile Include="runtime\Environment.cs" />
     <Compile Include="Exceptions.cs" />
-    <Compile Include="Metadata.cs" />
-    <Compile Include="Visitors\NormaliserVisitor.cs" />
-    <Compile Include="Visitors\PrettyPrinter.cs" />
+    <Compile Include="visitors\NormaliserVisitor.cs" />
+    <Compile Include="visitors\PrettyPrinter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Visitors\RecursiveSimplifier.cs" />
-    <Compile Include="SymbolTable.cs" />
+    <Compile Include="visitors\BryantReducer.cs" />
+    <Compile Include="runtime\SymbolTable.cs" />
     <Compile Include="TreeBuilder.cs" />
     <Compile Include="UtilityFunctions.cs" />
-    <Compile Include="Visitors\VertexCounterVisitor.cs" />
-    <Compile Include="Visitors\Visitor.cs" />
+    <Compile Include="visitors\VertexCounterVisitor.cs" />
+    <Compile Include="visitors\Visitor.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="LICENSE.txt" />

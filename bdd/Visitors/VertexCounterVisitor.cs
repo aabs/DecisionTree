@@ -1,4 +1,4 @@
-﻿namespace bdd
+﻿namespace DecisionDiagrams
 {
     using DT = DecisionTree<BaseDtVertexType, DtBranchTest>;
     using TV = Vertex<BaseDtVertexType, DtBranchTest>;

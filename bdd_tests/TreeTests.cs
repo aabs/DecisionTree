@@ -1,22 +1,22 @@
-﻿using bdd;
+﻿using DecisionDiagrams;
 using FluentAssertions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using System;
 using System.Linq;
 
 namespace bdd_tests
 {
-    [TestClass]
+    [TestFixture]
     public class TreeTests
     {
-        [TestMethod]
+        [Test]
         public void CanCreateGraphVertex()
         {
             var sut = new Vertex<string, string>("hello world");
             sut.Should().NotBeNull();
         }
 
-        [TestMethod]
+        [Test]
         public void CanLinkVertices()
         {
             var sut = new Vertex<string, string>("hello world");
@@ -27,7 +27,7 @@ namespace bdd_tests
             sut.Children.First().TargetVertex.Content.Should().Be("node");
         }
 
-        [TestMethod]
+        [Test]
         public void CanLinkVerticesUsingIndexer()
         {
             var sut = new Vertex<string, string>("hello world");
@@ -38,7 +38,7 @@ namespace bdd_tests
             sut.Children.First().TargetVertex.Content.Should().Be("vertex");
         }
 
-        [TestMethod]
+        [Test]
         public void CanGetNodeValueViaIndexer()
         {
             var sut = new Vertex<string, string>("hello world");
@@ -46,15 +46,14 @@ namespace bdd_tests
             sut["edge"].Should().Be("vertex");
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(DecisionException))]
+        [Test]
         public void HandlesInvalidAccessorProperly()
         {
             var sut = new Vertex<string, string>("hello world");
-            var dummy = sut["missing"];
+            Assert.Throws<DecisionException>(() => { var dummy = sut["missing"]; });
         }
 
-        [TestMethod]
+        [Test]
         public void CanCreateChain()
         {
             var sut = new Vertex<string, string>("vertex1");
@@ -66,7 +65,7 @@ namespace bdd_tests
             v3.Should().NotBeNull();
         }
 
-        [TestMethod]
+        [Test]
         public void CanHaveMultipleChildren()
         {
             var sut = new Vertex<string, string>("vertex1");
@@ -76,7 +75,7 @@ namespace bdd_tests
             sut["e2"].Should().Be("v3");
         }
 
-        [TestMethod]
+        [Test]
         public void CanTestEquivalence()
         {
             var sut = new Vertex<string, string>("v1");
@@ -87,10 +86,10 @@ namespace bdd_tests
             sut2["e1"] = "v2";
             sut2["e2"] = "v3";
 
-            sut.EquivalentTo(sut2).Should().Be(true);
+            sut.IsEqual(sut2).Should().Be(true);
         }
 
-        [TestMethod]
+        [Test]
         public void CanTestEquivalenceRecursively()
         {
             var sut = new Vertex<string, string>("v1");
@@ -101,10 +100,10 @@ namespace bdd_tests
             sut2["e1"] = "v2";
             sut2.Child("e1")["e2"] = "v3";
 
-            sut.EquivalentTo(sut2).Should().Be(true);
+            sut.IsEqual(sut2).Should().Be(true);
         }
 
-        [TestMethod]
+        [Test]
         public void CanTestNonequivalence()
         {
             var sut = new Vertex<string, string>("v1");
@@ -115,9 +114,9 @@ namespace bdd_tests
             sut2["e1"] = "v2";
             sut2["e2"] = "v3";
 
-            sut.EquivalentTo(sut2).Should().Be(false);
+            sut.IsEqual(sut2).Should().Be(false);
         }
-        [TestMethod]
+        [Test]
         public void CanTestNonequivalence2()
         {
             var sut = new Vertex<string, string>("v1");
@@ -126,9 +125,9 @@ namespace bdd_tests
 
             var sut2 = new Vertex<string, string>("v1");
 
-            sut.EquivalentTo(sut2).Should().Be(false);
+            sut.IsEqual(sut2).Should().Be(false);
         }
-        [TestMethod]
+        [Test]
         public void CanTestNonequivalence3()
         {
             var sut = new Vertex<string, string>("v1");
@@ -137,17 +136,17 @@ namespace bdd_tests
             sut2["e1"] = "v2";
             sut2["e2"] = "v3";
 
-            sut.EquivalentTo(sut2).Should().Be(false);
+            sut.IsEqual(sut2).Should().Be(false);
         }
-        [TestMethod]
+        [Test]
         public void CanTestNonequivalence4()
         {
             var sut = new Vertex<string, string>("v1");
             var sut2 = new Vertex<string, string>("other");
-            sut.EquivalentTo(sut2).Should().Be(false);
+            sut.IsEqual(sut2).Should().Be(false);
         }
 
-        [TestMethod]
+        [Test]
         public void CanTestNonequivalence5()
         {
             var sut = new Vertex<string, string>("v1");
@@ -158,7 +157,7 @@ namespace bdd_tests
             sut2["e1"] = "v2";
             sut2["e2"] = "v3";
 
-            sut.EquivalentTo(sut2).Should().Be(false);
+            sut.IsEqual(sut2).Should().Be(false);
         }
 
         public class TestEdgeType : IEquatable<TestEdgeType>
@@ -189,14 +188,14 @@ namespace bdd_tests
             }
         }
 
-        [TestMethod]
+        [Test]
         public void CanCreateGraphVertex_Objects()
         {
             var sut = new Vertex<TestVertexType, TestEdgeType>(new TestVertexType(42));
             sut.Should().NotBeNull();
         }
 
-        [TestMethod]
+        [Test]
         public void CanLinkVertices_Objects()
         {
             var sut = new Vertex<TestVertexType, TestEdgeType>(new TestVertexType(42));
@@ -207,7 +206,7 @@ namespace bdd_tests
             sut.Children.First().TargetVertex.Content.Name.Should().Be(3);
         }
 
-        [TestMethod]
+        [Test]
         public void CanLinkVerticesUsingIndexer_Objects()
         {
             var sut = new Vertex<TestVertexType, TestEdgeType>(new TestVertexType(42));
@@ -222,7 +221,7 @@ namespace bdd_tests
             sut.Children.First().TargetVertex.Content.Name.Should().Be(7);
         }
 
-        [TestMethod]
+        [Test]
         public void CanGetNodeValueViaIndexer_Objects()
         {
             var sut = new Vertex<TestVertexType, TestEdgeType>(new TestVertexType(42));
@@ -232,16 +231,15 @@ namespace bdd_tests
             sut[e1].Should().Be(v1);
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(DecisionException))]
+        [Test]
         public void HandlesInvalidAccessorProperly_Objects()
         {
             var sut = new Vertex<TestVertexType, TestEdgeType>(new TestVertexType(42));
             var missing = new TestEdgeType(1);
-            var dummy = sut[missing];
+            Assert.Throws<DecisionException>(() => { var dummy = sut[missing]; });
         }
 
-        [TestMethod]
+        [Test]
         public void CanCreateChain_Objects()
         {
             var e1 = new TestEdgeType(1);
@@ -260,7 +258,7 @@ namespace bdd_tests
             v5.Should().NotBeNull();
         }
 
-        [TestMethod]
+        [Test]
         public void CanHaveMultipleChildren_Objects()
         {
             var e1 = new TestEdgeType(1);
@@ -277,7 +275,7 @@ namespace bdd_tests
             sut[e2].Should().Be(v3);
         }
 
-        [TestMethod]
+        [Test]
         public void CanTestEquivalence_Objects()
         {
             var e1 = new TestEdgeType(1);
@@ -295,10 +293,10 @@ namespace bdd_tests
             sut2[e1] = v2;
             sut2[e2] = v3;
 
-            sut.EquivalentTo(sut2).Should().Be(true);
+            sut.IsEqual(sut2).Should().Be(true);
         }
 
-        [TestMethod]
+        [Test]
         public void CanTestEquivalenceRecursively_Objects()
         {
             var e1 = new TestEdgeType(1);
@@ -316,10 +314,10 @@ namespace bdd_tests
             sut2[e1] = v2;
             sut2.Child(e1)[e2] = v3;
 
-            sut.EquivalentTo(sut2).Should().Be(true);
+            sut.IsEqual(sut2).Should().Be(true);
         }
 
-        [TestMethod]
+        [Test]
         public void CanTestNonequivalence_Objects()
         {
             var e1 = new TestEdgeType(1);
@@ -339,9 +337,9 @@ namespace bdd_tests
             sut2[e1] = v2;
             sut2[e2] = v3;
 
-            sut.EquivalentTo(sut2).Should().Be(false);
+            sut.IsEqual(sut2).Should().Be(false);
         }
-        [TestMethod]
+        [Test]
         public void CanTestNonequivalence2_Objects()
         {
             var e1 = new TestEdgeType(1);
@@ -356,9 +354,9 @@ namespace bdd_tests
 
             var sut2 = new Vertex<TestVertexType, TestEdgeType>(v1);
 
-            sut.EquivalentTo(sut2).Should().Be(false);
+            sut.IsEqual(sut2).Should().Be(false);
         }
-        [TestMethod]
+        [Test]
         public void CanTestNonequivalence3_Objects()
         {
             var e1 = new TestEdgeType(1);
@@ -373,9 +371,9 @@ namespace bdd_tests
             sut2[e1] = v2;
             sut2[e2] = v3;
 
-            sut.EquivalentTo(sut2).Should().Be(false);
+            sut.IsEqual(sut2).Should().Be(false);
         }
-        [TestMethod]
+        [Test]
         public void CanTestNonequivalence4_Objects()
         {
             var v1 = new TestVertexType(1);
@@ -383,10 +381,10 @@ namespace bdd_tests
 
             var sut = new Vertex<TestVertexType, TestEdgeType>(v1);
             var sut2 = new Vertex<TestVertexType, TestEdgeType>(other);
-            sut.EquivalentTo(sut2).Should().Be(false);
+            sut.IsEqual(sut2).Should().Be(false);
         }
 
-        [TestMethod]
+        [Test]
         public void CanTestNonequivalence5_Objects()
         {
             var e1 = new TestEdgeType(1);
@@ -404,7 +402,7 @@ namespace bdd_tests
             sut2[e1] = v2;
             sut2[e2] = v3;
 
-            sut.EquivalentTo(sut2).Should().Be(false);
+            sut.IsEqual(sut2).Should().Be(false);
         }
 
     }

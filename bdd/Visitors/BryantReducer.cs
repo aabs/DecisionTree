@@ -4,18 +4,26 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace bdd
+namespace DecisionDiagrams
 {
     using DT = DecisionTree<BaseDtVertexType, DtBranchTest>;
     using TE = Edge<BaseDtVertexType, DtBranchTest>;
     using TV = Vertex<BaseDtVertexType, DtBranchTest>;
 
-    public class RecursiveSimplifier : VisitorSupertype
+    /// <summary>
+    /// A visitor that will perform the Bryant reduce algorithm from:
+    /// </summary>
+    /// <remarks>
+    /// This was documented in: 
+    /// Bryant, R. E. (1986). Graph-Based Algorithms for Boolean Function Manipulation. 
+    /// IEEE Transactions on Computers. http://doi.org/10.1109/TC.1986.1676819
+    /// </remarks>
+    public class BryantReducer : VisitorSupertype
     {
         public TE SimplifiedTree { get; set; }
         public string DefaultOutcome { get; private set; }
 
-        public RecursiveSimplifier(DT dt) : base(dt)
+        public BryantReducer(DT dt) : base(dt)
         {
         }
 
@@ -48,7 +56,7 @@ namespace bdd
             // of the children, plus v, can be thrown away (V is an element from
             // the original tree being simplified, so it probably won't be disposed right away
             // but at least it won't make it into the new simplified tree.
-            if (children.AllIdentical())
+            if (children.Select(c=>c.TargetVertex).AllIdentical())
             {
                 return children.First().TargetVertex;
             }
@@ -61,9 +69,18 @@ namespace bdd
         {
             // edges cannot be simplified, but to support a cleaner form of recursive simplification,
             // let's pretend they can...
-            var x = e.Label.TestValue == null ? new DtBranchTest(null) : new DtBranchTest(new AttributePermissibleValue { ClassName = e.Label.TestValue.ClassName, Value = e.Label.TestValue.Value });
+            var apv = e?.Label?.TestValue;
+            AttributePermissibleValue apv2 = null;
+            if (apv != null)
+            {
+                apv2 = new AttributePermissibleValue
+                {
+                    ClassName = apv.ClassName,
+                    Value     = apv.Value
+                };
+            }
             return new TE(
-                x,
+                new DtBranchTest(apv2),
                 Simplify(e.TargetVertex)
                 );
         }
@@ -89,10 +106,10 @@ namespace bdd
             if (v.Content is DtTest)
             {
                 var y = v.Content as DtTest;
-                contents = new DtTest(new DecisionSpaceAttribute
+                contents = new DtTest(new Attribute
                 {
-                    Classes = (from dc in y.Attribute.Classes select new DataClass { Id = dc.Id, Name = dc.Name }).ToList(),
-                    DataType = y.Attribute.DataType,
+                    PossibleValues = (from dc in y.Attribute.PossibleValues select new PossibleValue { Value = dc.Value }).ToList(),
+                    KindOfData = y.Attribute.KindOfData,
                     Name = y.Attribute.Name
                 });
             }
