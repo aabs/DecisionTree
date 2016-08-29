@@ -7,20 +7,20 @@ namespace DecisionDiagrams
 {
 
     [DebuggerDisplay("V:{Content.ToString()}({children.Count})")]
-    public class Vertex<TVertexType, TEdgeLabelType> : GraphElementSupertype, IEquatable<Vertex<TVertexType, TEdgeLabelType>>
+    public class KNOCKOUT_Vertex<TVertexType, TEdgeLabelType> : GraphElementSupertype, IEquatable<KNOCKOUT_Vertex<TVertexType, TEdgeLabelType>>
         where TVertexType : IEquatable<TVertexType>
         where TEdgeLabelType : IEquatable<TEdgeLabelType>
     {
-        public IEnumerable<Edge<TVertexType, TEdgeLabelType>> Parents { get; }
+        public IEnumerable<KNOCKOUT_Edge<TVertexType, TEdgeLabelType>> Parents { get; }
         public TVertexType Content { get; set; }
-        List<Edge<TVertexType, TEdgeLabelType>> children = new List<Edge<TVertexType, TEdgeLabelType>>();
+        List<KNOCKOUT_Edge<TVertexType, TEdgeLabelType>> children = new List<KNOCKOUT_Edge<TVertexType, TEdgeLabelType>>();
 
-        public Vertex(TVertexType v)
+        public KNOCKOUT_Vertex(TVertexType v)
         {
             this.Content = v;
         }
 
-        public IEnumerable<Edge<TVertexType, TEdgeLabelType>> Children
+        public IEnumerable<KNOCKOUT_Edge<TVertexType, TEdgeLabelType>> Children
         {
             get
             {
@@ -28,7 +28,7 @@ namespace DecisionDiagrams
             }
         }
 
-        public Vertex<TVertexType, TEdgeLabelType> AddChild(Edge<TVertexType, TEdgeLabelType> e)
+        public KNOCKOUT_Vertex<TVertexType, TEdgeLabelType> AddChild(KNOCKOUT_Edge<TVertexType, TEdgeLabelType> e)
         {
             children.Add(e);
             // consider wiring up parent vertex propr at this point
@@ -42,22 +42,22 @@ namespace DecisionDiagrams
                 throw new ApplicationException("Child link already exists.  Consider using Replace operation instead.");
             }
 
-            var graphVertex = new Vertex<TVertexType, TEdgeLabelType>(n);
-            children.Add(new Edge<TVertexType, TEdgeLabelType>(e, graphVertex));
+            var graphVertex = new KNOCKOUT_Vertex<TVertexType, TEdgeLabelType>(n);
+            children.Add(new KNOCKOUT_Edge<TVertexType, TEdgeLabelType>(e, graphVertex));
         }
 
-        public Vertex<TVertexType, TEdgeLabelType> Child(TEdgeLabelType e)
+        public KNOCKOUT_Vertex<TVertexType, TEdgeLabelType> Child(TEdgeLabelType e)
         {
             return (from c in Children
                     where c.Label.Equals(e)
                     select c.TargetVertex).First();
         }
 
-        public bool IsEqual(Vertex<TVertexType, TEdgeLabelType> sut2)
+        public bool IsEqual(KNOCKOUT_Vertex<TVertexType, TEdgeLabelType> sut2)
         {
             try
             {
-                bool result = this.Content.Equals(sut2.Content);
+                var result = this.Content.Equals(sut2.Content);
                 result = result && (Children.Count() == sut2.Children.Count());
                 if (result)
                 {
@@ -98,10 +98,10 @@ namespace DecisionDiagrams
                 return false;
             }
 
-            return IsEqual((Vertex<TVertexType, TEdgeLabelType>)obj);
+            return IsEqual((KNOCKOUT_Vertex<TVertexType, TEdgeLabelType>)obj);
         }
 
-        public bool Equals(Vertex<TVertexType, TEdgeLabelType> other)
+        public bool Equals(KNOCKOUT_Vertex<TVertexType, TEdgeLabelType> other)
         {
             return IsEqual(other);
         }

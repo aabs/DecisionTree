@@ -1,4 +1,5 @@
 ﻿using DecisionDiagrams;
+using QuickGraph;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,33 +9,31 @@ using System.Threading.Tasks;
 namespace DecisionDiagrams
 {
     public interface IVisitor<TNodeType, TTestType>
-        where TNodeType : IEquatable<TNodeType>
-        where TTestType : IEquatable<TTestType>
     {
-        void Visit(Edge<TNodeType, TTestType> n);
-        void Visit(Vertex<TNodeType, TTestType> v);
+        void Visit(TaggedEdge<TNodeType, TTestType> n);
+        void Visit(TNodeType v);
     }
 
     public abstract class VisitorSupertype : IVisitor<BaseDtVertexType, DtBranchTest>
     {
-        private DecisionTree<BaseDtVertexType, DtBranchTest> dt;
+        protected GraphType g;
 
-        public VisitorSupertype(DecisionTree<BaseDtVertexType, DtBranchTest> dt)
+        protected VisitorSupertype(GraphType g)
         {
-            this.dt = dt;
+            this.g = g;
         }
 
-        public virtual void Visit(Vertex<BaseDtVertexType, DtBranchTest> v)
+        public virtual void Visit(BaseDtVertexType v)
         {
-            foreach (var c in v.Children)
+            foreach (var c in g.OutEdges(v))
             {
                 Visit(c);
             }
         }
 
-        public virtual void Visit(Edge<BaseDtVertexType, DtBranchTest> e)
+        public virtual void Visit(TaggedEdge<BaseDtVertexType, DtBranchTest> e)
         {
-            Visit(e.TargetVertex);
+            Visit(e.Target);
         }
     }
 

@@ -8,8 +8,17 @@ using System.Xml.Linq;
 
 namespace DecisionDiagrams
 {
+    using QuickGraph;
     using DecisionTree = DecisionTree<BaseDtVertexType, DtBranchTest>;
 
+    public class GraphType : AdjacencyGraph<BaseDtVertexType, TaggedEdge<BaseDtVertexType, DtBranchTest>>
+    {
+        public BaseDtVertexType Root
+        {
+            get { return this.Vertices.First(); }
+        }
+
+    }
     public class TreeBuilder
     {
         public TreeBuilder(string metadataFileLocation)
@@ -56,10 +65,10 @@ namespace DecisionDiagrams
                         Name = a.Element("Name").Value,
                         KindOfData = a.Element("Type").Value,
                         PossibleValues = (from c in a.Descendants("Class")
-                                   select new PossibleValue
-                                   {
-                                       Value = c.Element("Name").Value
-                                   }).ToList()
+                                          select new PossibleValue
+                                          {
+                                              Value = c.Element("Name").Value
+                                          }).ToList()
                     }).ToList();
         }
 
@@ -88,19 +97,19 @@ namespace DecisionDiagrams
             var data = CsvParser.Parse(csvString, new CsvSettings { FieldDelimiter = ',', RowDelimiter = "\n" });
             var samples = ConvertSampleDataToDataSet(data).Tables["Samples"].AsEnumerable();
             SymbolTable.DecisionMetadata.AllSamples = samples;
-            var root = CreateTree(samples,
+            var g = new GraphType();
+            CreateTree(g,
+                samples,
                 SymbolTable.DecisionMetadata.Attributes);
-            var dt = new DecisionTree
+            var dt = new DecisionTree<BaseDtVertexType, DtBranchTest>
             {
-                Tree = new Graph<BaseDtVertexType, DtBranchTest>
-                {
-                    Root = new Edge<BaseDtVertexType, DtBranchTest>(new DtBranchTest(null), root)
-                }
+                Tree = g
             };
             return dt;
         }
 
-        public Vertex<BaseDtVertexType, DtBranchTest> CreateTree(IEnumerable<DataRow> examples,
+        public BaseDtVertexType CreateTree(GraphType g,
+            IEnumerable<DataRow> examples,
             IEnumerable<Attribute> attributes)
         {
             // 0. if all samples have same outcome create terminal node with that outcome
@@ -108,14 +117,17 @@ namespace DecisionDiagrams
             {
                 if (AllSamplesHaveSameOutcome(examples, o))
                 {
-                    return new Vertex<BaseDtVertexType, DtBranchTest>(new DtOutcome(o.Name));
+                    var x = new DtOutcome(o.Name);
+                    g.AddVertex(x);
+                    return x;
                 }
             }
             // if we get to here, data must be variegated...
 
             // 1. find the best attribute to classify sample data
             var attr = GetDominatingAttribute(examples, attributes);
-            var result = new Vertex<BaseDtVertexType, DtBranchTest>(new DtTest(attr));
+            var result = new DtTest(attr);
+            g.AddVertex(result);
             // 2. for each class under that attribute
             foreach (PossibleValue cls in attr.PossibleValues)
             {
@@ -128,11 +140,10 @@ namespace DecisionDiagrams
                     //       with the attribute list filtered to remove the attribute
                     var filteredAttributes = attributes.Except(new[] { attr });
                     var edgeLabel = new AttributePermissibleValue { ClassName = cls.Value, Value = cls.Value };
-                    var targetVertex = CreateTree(filteredExamples, filteredAttributes);
+                    var targetVertex = CreateTree(g, filteredExamples, filteredAttributes);
                     var branch = new DtBranchTest(edgeLabel);
-                    var edge = new Edge<BaseDtVertexType, DtBranchTest>(branch, targetVertex);
-                    edge.OriginVertex = result;
-                    result.AddChild(edge);
+                    var edge = new TaggedEdge<BaseDtVertexType, DtBranchTest>(result, targetVertex, branch);
+                    g.AddEdge(edge);
                 }
             }
             return result;

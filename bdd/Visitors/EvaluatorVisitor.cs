@@ -1,7 +1,9 @@
-﻿namespace DecisionDiagrams
+﻿using QuickGraph;
+
+namespace DecisionDiagrams
 {
-    using DT = DecisionTree<BaseDtVertexType, DtBranchTest>;
-    using TE = Edge<BaseDtVertexType, DtBranchTest>;
+    using DT = GraphType;
+    using TE = TaggedEdge<BaseDtVertexType, DtBranchTest>;
 
     public class EvaluatorVisitor : VisitorSupertype
     {
@@ -21,28 +23,28 @@
             {
                 return;
             }
-            Visit(e.TargetVertex);
+            Visit(e.Target);
         }
 
-        public new void Visit(Vertex<BaseDtVertexType, DtBranchTest> v)
+        public new void Visit(BaseDtVertexType v)
         {
             if (EvaluatedResult != null)
             {
                 return;
             }
             // if the vertex is an outcome then take it, otherwise navigate allong the matching edge
-            if (v.Content is DtOutcome)
+            if (v is DtOutcome)
             {
-                EvaluatedResult = ((DtOutcome)v.Content).OutcomeValue;
+                EvaluatedResult = ((DtOutcome)v).OutcomeValue;
                 return;
             }
-            if (v.Content is DtTest)
+            if (v is DtTest)
             {
-                var x = v.Content as DtTest;
+                var x = v as DtTest;
                 var testValue = Environment.Resolve(x.Attribute);
-                foreach (var c in v.Children)
+                foreach (var c in g.OutEdges(v))
                 {
-                    var lblVal = c.Label.TestValue.Value;
+                    var lblVal = c.Tag.TestValue.Value;
                     if (testValue == (string)lblVal)
                     {
                         Visit(c);

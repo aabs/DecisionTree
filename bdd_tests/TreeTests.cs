@@ -12,14 +12,14 @@ namespace bdd_tests
         [Test]
         public void CanCreateGraphVertex()
         {
-            var sut = new Vertex<string, string>("hello world");
+            var sut = new KNOCKOUT_Vertex<string, string>("hello world");
             sut.Should().NotBeNull();
         }
 
         [Test]
         public void CanLinkVertices()
         {
-            var sut = new Vertex<string, string>("hello world");
+            var sut = new KNOCKOUT_Vertex<string, string>("hello world");
             sut.Children.Count().Should().Be(0);
             sut.AddChild("node", "link");
             sut.Children.Count().Should().Be(1);
@@ -30,7 +30,7 @@ namespace bdd_tests
         [Test]
         public void CanLinkVerticesUsingIndexer()
         {
-            var sut = new Vertex<string, string>("hello world");
+            var sut = new KNOCKOUT_Vertex<string, string>("hello world");
             sut.Children.Count().Should().Be(0);
             sut["edge"] = "vertex";
             sut.Children.Count().Should().Be(1);
@@ -41,7 +41,7 @@ namespace bdd_tests
         [Test]
         public void CanGetNodeValueViaIndexer()
         {
-            var sut = new Vertex<string, string>("hello world");
+            var sut = new KNOCKOUT_Vertex<string, string>("hello world");
             sut["edge"] = "vertex";
             sut["edge"].Should().Be("vertex");
         }
@@ -49,14 +49,14 @@ namespace bdd_tests
         [Test]
         public void HandlesInvalidAccessorProperly()
         {
-            var sut = new Vertex<string, string>("hello world");
+            var sut = new KNOCKOUT_Vertex<string, string>("hello world");
             Assert.Throws<DecisionException>(() => { var dummy = sut["missing"]; });
         }
 
         [Test]
         public void CanCreateChain()
         {
-            var sut = new Vertex<string, string>("vertex1");
+            var sut = new KNOCKOUT_Vertex<string, string>("vertex1");
             sut["link1"] = "vertex2";
             sut.Child("link1")["link2"] = "vertex3";
             var v2 = sut.Child("link1");
@@ -68,7 +68,7 @@ namespace bdd_tests
         [Test]
         public void CanHaveMultipleChildren()
         {
-            var sut = new Vertex<string, string>("vertex1");
+            var sut = new KNOCKOUT_Vertex<string, string>("vertex1");
             sut["e1"] = "v2";
             sut["e2"] = "v3";
             sut["e1"].Should().Be("v2");
@@ -78,11 +78,11 @@ namespace bdd_tests
         [Test]
         public void CanTestEquivalence()
         {
-            var sut = new Vertex<string, string>("v1");
+            var sut = new KNOCKOUT_Vertex<string, string>("v1");
             sut["e1"] = "v2";
             sut["e2"] = "v3";
 
-            var sut2 = new Vertex<string, string>("v1");
+            var sut2 = new KNOCKOUT_Vertex<string, string>("v1");
             sut2["e1"] = "v2";
             sut2["e2"] = "v3";
 
@@ -92,11 +92,11 @@ namespace bdd_tests
         [Test]
         public void CanTestEquivalenceRecursively()
         {
-            var sut = new Vertex<string, string>("v1");
+            var sut = new KNOCKOUT_Vertex<string, string>("v1");
             sut["e1"] = "v2";
             sut.Child("e1")["e2"] = "v3";
 
-            var sut2 = new Vertex<string, string>("v1");
+            var sut2 = new KNOCKOUT_Vertex<string, string>("v1");
             sut2["e1"] = "v2";
             sut2.Child("e1")["e2"] = "v3";
 
@@ -106,11 +106,11 @@ namespace bdd_tests
         [Test]
         public void CanTestNonequivalence()
         {
-            var sut = new Vertex<string, string>("v1");
+            var sut = new KNOCKOUT_Vertex<string, string>("v1");
             sut["e1"] = "v2";
             sut["other"] = "values";
 
-            var sut2 = new Vertex<string, string>("v1");
+            var sut2 = new KNOCKOUT_Vertex<string, string>("v1");
             sut2["e1"] = "v2";
             sut2["e2"] = "v3";
 
@@ -119,20 +119,20 @@ namespace bdd_tests
         [Test]
         public void CanTestNonequivalence2()
         {
-            var sut = new Vertex<string, string>("v1");
+            var sut = new KNOCKOUT_Vertex<string, string>("v1");
             sut["e1"] = "v2";
             sut["other"] = "values";
 
-            var sut2 = new Vertex<string, string>("v1");
+            var sut2 = new KNOCKOUT_Vertex<string, string>("v1");
 
             sut.IsEqual(sut2).Should().Be(false);
         }
         [Test]
         public void CanTestNonequivalence3()
         {
-            var sut = new Vertex<string, string>("v1");
+            var sut = new KNOCKOUT_Vertex<string, string>("v1");
 
-            var sut2 = new Vertex<string, string>("v1");
+            var sut2 = new KNOCKOUT_Vertex<string, string>("v1");
             sut2["e1"] = "v2";
             sut2["e2"] = "v3";
 
@@ -141,19 +141,19 @@ namespace bdd_tests
         [Test]
         public void CanTestNonequivalence4()
         {
-            var sut = new Vertex<string, string>("v1");
-            var sut2 = new Vertex<string, string>("other");
+            var sut = new KNOCKOUT_Vertex<string, string>("v1");
+            var sut2 = new KNOCKOUT_Vertex<string, string>("other");
             sut.IsEqual(sut2).Should().Be(false);
         }
 
         [Test]
         public void CanTestNonequivalence5()
         {
-            var sut = new Vertex<string, string>("v1");
+            var sut = new KNOCKOUT_Vertex<string, string>("v1");
             sut["e1"] = "v2";
             sut["e2"] = "different";
 
-            var sut2 = new Vertex<string, string>("v1");
+            var sut2 = new KNOCKOUT_Vertex<string, string>("v1");
             sut2["e1"] = "v2";
             sut2["e2"] = "v3";
 
@@ -191,14 +191,14 @@ namespace bdd_tests
         [Test]
         public void CanCreateGraphVertex_Objects()
         {
-            var sut = new Vertex<TestVertexType, TestEdgeType>(new TestVertexType(42));
+            var sut = new KNOCKOUT_Vertex<TestVertexType, TestEdgeType>(new TestVertexType(42));
             sut.Should().NotBeNull();
         }
 
         [Test]
         public void CanLinkVertices_Objects()
         {
-            var sut = new Vertex<TestVertexType, TestEdgeType>(new TestVertexType(42));
+            var sut = new KNOCKOUT_Vertex<TestVertexType, TestEdgeType>(new TestVertexType(42));
             sut.Children.Count().Should().Be(0);
             sut.AddChild(new TestVertexType(3), new TestEdgeType(4));
             sut.Children.Count().Should().Be(1);
@@ -209,7 +209,7 @@ namespace bdd_tests
         [Test]
         public void CanLinkVerticesUsingIndexer_Objects()
         {
-            var sut = new Vertex<TestVertexType, TestEdgeType>(new TestVertexType(42));
+            var sut = new KNOCKOUT_Vertex<TestVertexType, TestEdgeType>(new TestVertexType(42));
             sut.Children.Count().Should().Be(0);
 
             var e1 = new TestEdgeType(5);
@@ -224,7 +224,7 @@ namespace bdd_tests
         [Test]
         public void CanGetNodeValueViaIndexer_Objects()
         {
-            var sut = new Vertex<TestVertexType, TestEdgeType>(new TestVertexType(42));
+            var sut = new KNOCKOUT_Vertex<TestVertexType, TestEdgeType>(new TestVertexType(42));
             var e1 = new TestEdgeType(1);
             var v1 = new TestVertexType(1);
             sut[e1] = v1;
@@ -234,7 +234,7 @@ namespace bdd_tests
         [Test]
         public void HandlesInvalidAccessorProperly_Objects()
         {
-            var sut = new Vertex<TestVertexType, TestEdgeType>(new TestVertexType(42));
+            var sut = new KNOCKOUT_Vertex<TestVertexType, TestEdgeType>(new TestVertexType(42));
             var missing = new TestEdgeType(1);
             Assert.Throws<DecisionException>(() => { var dummy = sut[missing]; });
         }
@@ -249,7 +249,7 @@ namespace bdd_tests
             var e3 = new TestEdgeType(3);
             var v3 = new TestVertexType(3);
 
-            var sut = new Vertex<TestVertexType, TestEdgeType>(v1);
+            var sut = new KNOCKOUT_Vertex<TestVertexType, TestEdgeType>(v1);
             sut[e1] = v2;
             sut.Child(e1)[e2] = v3;
             var v4 = sut.Child(e1);
@@ -268,7 +268,7 @@ namespace bdd_tests
             var e3 = new TestEdgeType(3);
             var v3 = new TestVertexType(3);
 
-            var sut = new Vertex<TestVertexType, TestEdgeType>(v1);
+            var sut = new KNOCKOUT_Vertex<TestVertexType, TestEdgeType>(v1);
             sut[e1] = v2;
             sut[e2] = v3;
             sut[e1].Should().Be(v2);
@@ -285,11 +285,11 @@ namespace bdd_tests
             var e3 = new TestEdgeType(3);
             var v3 = new TestVertexType(3);
 
-            var sut = new Vertex<TestVertexType, TestEdgeType>(v1);
+            var sut = new KNOCKOUT_Vertex<TestVertexType, TestEdgeType>(v1);
             sut[e1] = v2;
             sut[e2] = v3;
 
-            var sut2 = new Vertex<TestVertexType, TestEdgeType>(v1);
+            var sut2 = new KNOCKOUT_Vertex<TestVertexType, TestEdgeType>(v1);
             sut2[e1] = v2;
             sut2[e2] = v3;
 
@@ -306,11 +306,11 @@ namespace bdd_tests
             var e3 = new TestEdgeType(3);
             var v3 = new TestVertexType(3);
 
-            var sut = new Vertex<TestVertexType, TestEdgeType>(v1);
+            var sut = new KNOCKOUT_Vertex<TestVertexType, TestEdgeType>(v1);
             sut[e1] = v2;
             sut.Child(e1)[e2] = v3;
 
-            var sut2 = new Vertex<TestVertexType, TestEdgeType>(v1);
+            var sut2 = new KNOCKOUT_Vertex<TestVertexType, TestEdgeType>(v1);
             sut2[e1] = v2;
             sut2.Child(e1)[e2] = v3;
 
@@ -329,11 +329,11 @@ namespace bdd_tests
             var v3 = new TestVertexType(3);
 
 
-            var sut = new Vertex<TestVertexType, TestEdgeType>(v1);
+            var sut = new KNOCKOUT_Vertex<TestVertexType, TestEdgeType>(v1);
             sut[e1] = v2;
             sut[other] = values;
 
-            var sut2 = new Vertex<TestVertexType, TestEdgeType>(v1);
+            var sut2 = new KNOCKOUT_Vertex<TestVertexType, TestEdgeType>(v1);
             sut2[e1] = v2;
             sut2[e2] = v3;
 
@@ -348,11 +348,11 @@ namespace bdd_tests
             var other = new TestEdgeType(2);
             var values = new TestVertexType(2);
 
-            var sut = new Vertex<TestVertexType, TestEdgeType>(v1);
+            var sut = new KNOCKOUT_Vertex<TestVertexType, TestEdgeType>(v1);
             sut[e1] = v2;
             sut[other] = values;
 
-            var sut2 = new Vertex<TestVertexType, TestEdgeType>(v1);
+            var sut2 = new KNOCKOUT_Vertex<TestVertexType, TestEdgeType>(v1);
 
             sut.IsEqual(sut2).Should().Be(false);
         }
@@ -365,9 +365,9 @@ namespace bdd_tests
             var v2 = new TestVertexType(2);
             var v3 = new TestVertexType(3);
 
-            var sut = new Vertex<TestVertexType, TestEdgeType>(v1);
+            var sut = new KNOCKOUT_Vertex<TestVertexType, TestEdgeType>(v1);
 
-            var sut2 = new Vertex<TestVertexType, TestEdgeType>(v1);
+            var sut2 = new KNOCKOUT_Vertex<TestVertexType, TestEdgeType>(v1);
             sut2[e1] = v2;
             sut2[e2] = v3;
 
@@ -379,8 +379,8 @@ namespace bdd_tests
             var v1 = new TestVertexType(1);
             var other = new TestVertexType(2);
 
-            var sut = new Vertex<TestVertexType, TestEdgeType>(v1);
-            var sut2 = new Vertex<TestVertexType, TestEdgeType>(other);
+            var sut = new KNOCKOUT_Vertex<TestVertexType, TestEdgeType>(v1);
+            var sut2 = new KNOCKOUT_Vertex<TestVertexType, TestEdgeType>(other);
             sut.IsEqual(sut2).Should().Be(false);
         }
 
@@ -394,11 +394,11 @@ namespace bdd_tests
             var v3 = new TestVertexType(3);
             var different = new TestVertexType(7);
 
-            var sut = new Vertex<TestVertexType, TestEdgeType>(v1);
+            var sut = new KNOCKOUT_Vertex<TestVertexType, TestEdgeType>(v1);
             sut[e1] = v2;
             sut[e2] = different;
 
-            var sut2 = new Vertex<TestVertexType, TestEdgeType>(v1);
+            var sut2 = new KNOCKOUT_Vertex<TestVertexType, TestEdgeType>(v1);
             sut2[e1] = v2;
             sut2[e2] = v3;
 

@@ -6,9 +6,7 @@ using System.Threading.Tasks;
 
 namespace DecisionDiagrams
 {
-    using DT = DecisionTree<BaseDtVertexType, DtBranchTest>;
-    using TE = Edge<BaseDtVertexType, DtBranchTest>;
-    using TV = Vertex<BaseDtVertexType, DtBranchTest>;
+    using DT = GraphType;
     public class PrettyPrinter : VisitorSupertype
     {
         public PrettyPrinter(DT dt) : base(dt)

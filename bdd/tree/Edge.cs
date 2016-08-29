@@ -5,26 +5,26 @@ namespace DecisionDiagrams
 {
 
     [DebuggerDisplay("E:{Label.ToString()} {TargetVertex.ToString()}")]
-    public class Edge<TVertexType, TEdgeLabelType> : GraphElementSupertype, IEquatable<Edge<TVertexType, TEdgeLabelType>>
+    public class KNOCKOUT_Edge<TVertexType, TEdgeLabelType> : GraphElementSupertype, IEquatable<KNOCKOUT_Edge<TVertexType, TEdgeLabelType>>
         where TVertexType : IEquatable<TVertexType>
         where TEdgeLabelType : IEquatable<TEdgeLabelType>
     {
-        public Edge(TEdgeLabelType e, Vertex<TVertexType, TEdgeLabelType> target)
+        public KNOCKOUT_Edge(TEdgeLabelType e, KNOCKOUT_Vertex<TVertexType, TEdgeLabelType> target)
         {
             Label = e;
             TargetVertex = target;
         }
 
-        public Edge(TVertexType v, TEdgeLabelType e)
+        public KNOCKOUT_Edge(TVertexType v, TEdgeLabelType e)
         {
             Label = e;
-            TargetVertex = new Vertex<TVertexType, TEdgeLabelType>(v);
+            TargetVertex = new KNOCKOUT_Vertex<TVertexType, TEdgeLabelType>(v);
         }
         public TEdgeLabelType Label { get; set; }
-        public Vertex<TVertexType, TEdgeLabelType> OriginVertex { get; internal set; }
-        public Vertex<TVertexType, TEdgeLabelType> TargetVertex { get; set; }
+        public KNOCKOUT_Vertex<TVertexType, TEdgeLabelType> OriginVertex { get; internal set; }
+        public KNOCKOUT_Vertex<TVertexType, TEdgeLabelType> TargetVertex { get; set; }
 
-        public bool Equals(Edge<TVertexType, TEdgeLabelType> other)
+        public bool Equals(KNOCKOUT_Edge<TVertexType, TEdgeLabelType> other)
         {
             return Label.Equals(other.Label) &&
                 TargetVertex.Equals(other.TargetVertex);

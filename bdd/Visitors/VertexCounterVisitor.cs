@@ -1,12 +1,10 @@
 ﻿namespace DecisionDiagrams
 {
-    using DT = DecisionTree<BaseDtVertexType, DtBranchTest>;
-    using TV = Vertex<BaseDtVertexType, DtBranchTest>;
     public class VertexCounterVisitor : VisitorSupertype
     {
         private int counter = 0;
 
-        public VertexCounterVisitor(DT dt) : base(dt)
+        public VertexCounterVisitor(GraphType g) : base(g)
         {
         }
 
@@ -18,7 +16,7 @@
         public int Counter { get { return counter; } }
         public string DefaultOutcome { get; private set; }
 
-        public override void Visit(TV v)
+        public override void Visit(BaseDtVertexType v)
         {
             base.Visit(v);
             counter++;

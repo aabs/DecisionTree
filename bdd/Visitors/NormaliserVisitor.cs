@@ -6,32 +6,31 @@ using System.Threading.Tasks;
 
 namespace DecisionDiagrams
 {
+    using QuickGraph;
     using DT = DecisionTree<BaseDtVertexType, DtBranchTest>;
-    using TE = Edge<BaseDtVertexType, DtBranchTest>;
-    using TV = Vertex<BaseDtVertexType, DtBranchTest>;
 
     public class NormaliserSimplifier : VisitorSupertype
     {
-        public NormaliserSimplifier(DT dt, string defaultOutcome) : base(dt)
+        public NormaliserSimplifier(GraphType dt, string defaultOutcome) : base(dt)
         {
             this.DefaultOutcome = defaultOutcome;
         }
 
         public string DefaultOutcome { get; private set; }
 
-        public override void Visit(TE e)
+        public override void Visit(TaggedEdge<BaseDtVertexType, DtBranchTest> e)
         {
-            Visit(e.TargetVertex);
+            Visit(e.Target);
         }
 
-        public override void Visit(TV v)
+        public override void Visit(BaseDtVertexType v)
         {
-            if (v.Content is DtTest)
+            if (v is DtTest)
             {
-                var t = v.Content as DtTest;
+                var t = v as DtTest;
 
                 // first visit all the children before we go plugging any gaps
-                foreach (var child in v.Children)
+                foreach (var child in g.OutEdges(v))
                 {
                     Visit(child);
                 }
@@ -43,12 +42,9 @@ namespace DecisionDiagrams
                 {
                     // if none of the children of this vertex has a label corresponding to the
                     // data class dc, then create a default outcome
-                    if (!v.Children.Any(te => dc.Value == (string)te.Label.TestValue.Value))
+                    if (!g.OutEdges(v).Any(te => dc.Value == (string)te.Tag.TestValue.Value))
                     {
-                        v.AddChild(
-                            new DtOutcome(DefaultOutcome),
-                            new DtBranchTest(new AttributePermissibleValue { ClassName = dc.Value, Value = dc.Value })
-                            );
+                        g.AddEdge(new TaggedEdge<BaseDtVertexType, DtBranchTest>(v, new DtOutcome(DefaultOutcome), new DtBranchTest(new AttributePermissibleValue { ClassName = dc.Value, Value = dc.Value })));
                     }
                 }
             }
