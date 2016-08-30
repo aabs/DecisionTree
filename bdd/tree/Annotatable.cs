@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 
 namespace DecisionDiagrams
 {
-    public abstract class GraphElementSupertype
+    public abstract class Annotatable
     {
 
         // The dictionary of annotations supports the attachment of arbitrary information to the nodes of the graph
         // related operations support their maintenance.
         private Dictionary<string, object> annotations = new Dictionary<string, object>();
 
-        public virtual void AddAnnotate(string source, object annotation)
+        public virtual void AddAnnotation(string source, object annotation)
         {
             annotations[source] = annotation;
         }

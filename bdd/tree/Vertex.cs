@@ -7,7 +7,7 @@ namespace DecisionDiagrams
 {
 
     [DebuggerDisplay("V:{Content.ToString()}({children.Count})")]
-    public class KNOCKOUT_Vertex<TVertexType, TEdgeLabelType> : GraphElementSupertype, IEquatable<KNOCKOUT_Vertex<TVertexType, TEdgeLabelType>>
+    public class KNOCKOUT_Vertex<TVertexType, TEdgeLabelType> : Annotatable, IEquatable<KNOCKOUT_Vertex<TVertexType, TEdgeLabelType>>
         where TVertexType : IEquatable<TVertexType>
         where TEdgeLabelType : IEquatable<TEdgeLabelType>
     {

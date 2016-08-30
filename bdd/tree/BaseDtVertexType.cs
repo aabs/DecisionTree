@@ -2,7 +2,7 @@
 
 namespace DecisionDiagrams
 {
-    public abstract class BaseDtVertexType
+    public abstract class BaseDtVertexType : Annotatable
     {
     }
 }

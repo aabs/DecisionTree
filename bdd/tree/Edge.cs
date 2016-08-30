@@ -5,7 +5,7 @@ namespace DecisionDiagrams
 {
 
     [DebuggerDisplay("E:{Label.ToString()} {TargetVertex.ToString()}")]
-    public class KNOCKOUT_Edge<TVertexType, TEdgeLabelType> : GraphElementSupertype, IEquatable<KNOCKOUT_Edge<TVertexType, TEdgeLabelType>>
+    public class KNOCKOUT_Edge<TVertexType, TEdgeLabelType> : Annotatable, IEquatable<KNOCKOUT_Edge<TVertexType, TEdgeLabelType>>
         where TVertexType : IEquatable<TVertexType>
         where TEdgeLabelType : IEquatable<TEdgeLabelType>
     {

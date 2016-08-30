@@ -81,6 +81,18 @@ namespace bdd_tests
         }
 
         [Test]
+        public void CanVisitTree()
+        {
+            var treeBuilder = new TreeBuilder(GetMetadataPath());
+            var decisionTree = treeBuilder.CreateTree();
+            var normaliser = new NormaliserSimplifier(decisionTree.Tree, "Unmatched");
+            normaliser.Visit(decisionTree.Tree.Root);
+            var sut = new Reducer();
+            var g = sut.Reduce(treeBuilder.SymbolTable, decisionTree.Tree);
+            EvaluatesAllTestDataCorrectly(treeBuilder, decisionTree.Tree);
+        }
+
+        [Test]
         public void CanSimplifyTree()
         {
             var sut = new TreeBuilder(GetMetadataPath());

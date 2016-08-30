@@ -44,7 +44,10 @@ namespace DecisionDiagrams
                     // data class dc, then create a default outcome
                     if (!g.OutEdges(v).Any(te => dc.Value == (string)te.Tag.TestValue.Value))
                     {
-                        g.AddEdge(new TaggedEdge<BaseDtVertexType, DtBranchTest>(v, new DtOutcome(DefaultOutcome), new DtBranchTest(new AttributePermissibleValue { ClassName = dc.Value, Value = dc.Value })));
+                        var newTag = new DtBranchTest(new AttributePermissibleValue { ClassName = dc.Value, Value = dc.Value });
+                        var newLeaf = new DtOutcome(DefaultOutcome);
+                        g.AddVertex(newLeaf);
+                        g.AddEdge(new TaggedEdge<BaseDtVertexType, DtBranchTest>(v, newLeaf, newTag));
                     }
                 }
             }

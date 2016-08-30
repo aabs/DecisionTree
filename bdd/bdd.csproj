@@ -73,7 +73,7 @@
     <Compile Include="metadata\Attribute.cs" />
     <Compile Include="metadata\Outcome.cs" />
     <Compile Include="metadata\Outcomes.cs" />
-    <Compile Include="tree\GraphElementSupertype.cs" />
+    <Compile Include="tree\Annotatable.cs" />
     <Compile Include="tree\Vertex.cs" />
     <Compile Include="visitors\EvaluatorVisitor.cs" />
     <Compile Include="runtime\Environment.cs" />
@@ -84,6 +84,7 @@
     <Compile Include="runtime\SymbolTable.cs" />
     <Compile Include="TreeBuilder.cs" />
     <Compile Include="UtilityFunctions.cs" />
+    <Compile Include="visitors\Reducer.cs" />
     <Compile Include="visitors\VertexCounterVisitor.cs" />
     <Compile Include="visitors\Visitor.cs" />
   </ItemGroup>
