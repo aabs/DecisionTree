@@ -1,7 +1,7 @@
-﻿using System;
+﻿using Modd.Metadata;
 using System.Diagnostics;
 
-namespace DecisionDiagrams
+namespace Modd
 {
 
     [DebuggerDisplay("{ToDebuggerString()}")]

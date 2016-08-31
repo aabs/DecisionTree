@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 
-namespace DecisionDiagrams
+namespace Modd
 {
     [DebuggerDisplay("{ToDebuggerString()}")]
     public class DtOutcome : BaseDtVertexType

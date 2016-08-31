@@ -1,11 +1,12 @@
 ﻿
-using DecisionDiagrams;
+using Modd;
 using FluentAssertions;
 using NUnit.Framework;
 using System.Data;
 using System.Diagnostics;
 using System;
 using System.Linq;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace bdd_tests
 {
@@ -38,7 +39,7 @@ namespace bdd_tests
             var sut = new TreeBuilder(GetMetadataPath());
             var dt = sut.CreateTree();
 
-            EvaluatesAllTestDataCorrectly(sut, (DecisionDiagrams.GraphType)dt.Tree);
+            EvaluatesAllTestDataCorrectly(sut, (Modd.GraphType)dt.Tree);
         }
 
         private void EvaluatesAllTestDataCorrectly(TreeBuilder sut, GraphType g)
@@ -69,9 +70,9 @@ namespace bdd_tests
             correct.Should().Be(total);
         }
 
-        private DecisionDiagrams.Environment RowToEnv(SymbolTable st, DataRow row)
+        private Modd.Environment RowToEnv(SymbolTable st, DataRow row)
         {
-            var env = new DecisionDiagrams.Environment(st);
+            var env = new Modd.Environment(st);
             foreach (var attr in st.DecisionMetadata.Attributes)
             {
                 var colName = attr.Name;
@@ -81,13 +82,14 @@ namespace bdd_tests
         }
 
         [Test]
-        public void CanVisitTree()
+        public void CanReduceTreeWithoutChangingFunctionComputed()
         {
             var treeBuilder = new TreeBuilder(GetMetadataPath());
             var decisionTree = treeBuilder.CreateTree();
             var normaliser = new NormaliserSimplifier(decisionTree.Tree, "Unmatched");
             normaliser.Visit(decisionTree.Tree.Root);
             var sut = new Reducer();
+            EvaluatesAllTestDataCorrectly(treeBuilder, decisionTree.Tree);
             var g = sut.Reduce(treeBuilder.SymbolTable, decisionTree.Tree);
             EvaluatesAllTestDataCorrectly(treeBuilder, decisionTree.Tree);
         }
@@ -137,5 +139,6 @@ namespace bdd_tests
             // check that the modified DT still works OK.
             //EvaluatesAllTestDataCorrectly(sut, dt2);
         }
+
     }
 }

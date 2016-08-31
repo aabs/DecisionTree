@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace DecisionDiagrams
+namespace Modd
 {
     using System.Threading;
     using DT = DecisionTree<BaseDtVertexType, DtBranchTest>;
@@ -26,5 +26,13 @@ namespace DecisionDiagrams
             return seq.Skip(1).All(x => x.Equals(first));
         }
 
+
+        public static void Foreach<X>(this IEnumerable<X> seq, Action<X> task)
+        {
+            foreach (var item in seq)
+            {
+                task(item);
+            }
+        }
     }
 }

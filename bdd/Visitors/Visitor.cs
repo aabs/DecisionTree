@@ -1,4 +1,4 @@
-﻿using DecisionDiagrams;
+﻿using Modd;
 using QuickGraph;
 using System;
 using System.Collections.Generic;
@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DecisionDiagrams
+namespace Modd
 {
     public interface IVisitor<TNodeType, TTestType>
     {

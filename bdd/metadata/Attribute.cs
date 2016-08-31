@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.Linq;
 
-namespace DecisionDiagrams
+namespace Modd.Metadata
 {
     [DebuggerDisplay("{ToDebuggerString()}")]
     public class Attribute

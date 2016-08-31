@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DecisionDiagrams
+namespace Modd
 {
     public abstract class BaseDtVertexType : Annotatable
     {

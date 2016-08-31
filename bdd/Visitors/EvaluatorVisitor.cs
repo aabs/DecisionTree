@@ -1,6 +1,6 @@
 ﻿using QuickGraph;
 
-namespace DecisionDiagrams
+namespace Modd
 {
     using DT = GraphType;
     using TE = TaggedEdge<BaseDtVertexType, DtBranchTest>;

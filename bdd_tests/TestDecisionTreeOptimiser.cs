@@ -1,5 +1,5 @@
 ﻿using NUnit.Framework;
-using DecisionDiagrams;
+using Modd;
 using FluentAssertions;
 using System.Collections.Generic;
 

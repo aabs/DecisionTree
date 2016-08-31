@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Data;
 
-namespace DecisionDiagrams
+namespace Modd.Metadata
 {
     public class DecisionMetadata
     {

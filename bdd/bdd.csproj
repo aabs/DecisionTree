@@ -7,7 +7,7 @@
     <ProjectGuid>{273B57B6-0448-4D43-87FA-6612DD9D367F}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>DecisionDiagram</RootNamespace>
+    <RootNamespace>Modd</RootNamespace>
     <AssemblyName>bdd</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -61,6 +61,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Metadata\MetadataBuilder.cs" />
     <Compile Include="tree\BaseDtVertexType.cs" />
     <Compile Include="tree\DtBranchTest.cs" />
     <Compile Include="tree\DtOutcome.cs" />
@@ -68,11 +69,11 @@
     <Compile Include="tree\Edge.cs" />
     <Compile Include="tree\Graph.cs" />
     <Compile Include="tree\DecisionTree.cs" />
-    <Compile Include="metadata\PossibleValue.cs" />
-    <Compile Include="metadata\DecisionMetadata.cs" />
-    <Compile Include="metadata\Attribute.cs" />
-    <Compile Include="metadata\Outcome.cs" />
-    <Compile Include="metadata\Outcomes.cs" />
+    <Compile Include="Metadata\PossibleValue.cs" />
+    <Compile Include="Metadata\DecisionMetadata.cs" />
+    <Compile Include="Metadata\Attribute.cs" />
+    <Compile Include="Metadata\Outcome.cs" />
+    <Compile Include="Metadata\Outcomes.cs" />
     <Compile Include="tree\Annotatable.cs" />
     <Compile Include="tree\Vertex.cs" />
     <Compile Include="visitors\EvaluatorVisitor.cs" />

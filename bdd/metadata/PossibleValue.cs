@@ -1,4 +1,4 @@
-﻿namespace DecisionDiagrams
+﻿namespace Modd.Metadata
 {
     public class PossibleValue
     {

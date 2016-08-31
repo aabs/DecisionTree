@@ -1,1 +1,1 @@
-<Playlist Version="1.0"><Add Test="bdd_tests.TestTreeBuilder.CanVisitTree" /></Playlist>
+<Playlist Version="1.0"><Add Test="bdd_tests.TestTreeBuilder.CanVisitTree" /><Add Test="bdd_tests.TestTreeBuilder.CanReduceTreeWithoutChangingFunctionComputed" /></Playlist>

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
-namespace DecisionDiagrams
+namespace Modd
 {
 
     [DebuggerDisplay("V:{Content.ToString()}({children.Count})")]

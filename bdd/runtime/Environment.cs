@@ -1,10 +1,10 @@
-﻿using System;
+﻿using Modd.Metadata;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DecisionDiagrams
+namespace Modd
 {
     public class Environment
     {
@@ -18,7 +18,7 @@ namespace DecisionDiagrams
         {
             if (args == null)
             {
-                throw new ArgumentNullException(nameof(args));
+                throw new System.ArgumentNullException(nameof(args));
             }
             this.SymbolTable = new SymbolTable();
             this.ParentEnvironment = null;
@@ -31,7 +31,7 @@ namespace DecisionDiagrams
         {
             if (st == null)
             {
-                throw new ArgumentNullException(nameof(st));
+                throw new System.ArgumentNullException(nameof(st));
             }
             this.SymbolTable = st;
             this.ParentEnvironment = parent;

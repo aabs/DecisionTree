@@ -1,4 +1,4 @@
-﻿namespace DecisionDiagrams
+﻿namespace Modd
 {
     public class VertexCounterVisitor : VisitorSupertype
     {

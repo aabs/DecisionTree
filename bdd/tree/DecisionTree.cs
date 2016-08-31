@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DecisionDiagrams
+namespace Modd
 {
     public class DecisionTree<TNodeType, TTestType>
     {

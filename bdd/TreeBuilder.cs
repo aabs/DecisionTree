@@ -6,8 +6,10 @@ using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 
-namespace DecisionDiagrams
+namespace Modd
 {
+    using DecisionDiagram.Metadata;
+    using Metadata;
     using QuickGraph;
     using DecisionTree = DecisionTree<BaseDtVertexType, DtBranchTest>;
 
@@ -27,18 +29,13 @@ namespace DecisionDiagrams
             this.SymbolTable = LoadConfig(doc.Document.Root);
         }
 
-        #region Configuration Loading
-
         public SymbolTable SymbolTable { get; private set; }
 
         private SymbolTable LoadConfig(XElement root)
         {
-            var metadata = new DecisionMetadata
-            {
-                SampleDataLocation = root.Element("SampleData").Value,
-                Outcomes = LoadOutcomes(root),
-                Attributes = LoadAttributes(root)
-            };
+            var mdb = new MetadataBuilder(root.Element("SampleData").Value)
+                .WithOutcomeColumn(root.Element("OutcomeColumn").Value);
+            var metadata = mdb.Build();
             return BuildSymbolTable(metadata);
         }
 
@@ -56,40 +53,6 @@ namespace DecisionDiagrams
             }
             return result;
         }
-
-        private List<Attribute> LoadAttributes(XElement root)
-        {
-            return (from a in root.Descendants("Attribute")
-                    select new Attribute
-                    {
-                        Name = a.Element("Name").Value,
-                        KindOfData = a.Element("Type").Value,
-                        PossibleValues = (from c in a.Descendants("Class")
-                                          select new PossibleValue
-                                          {
-                                              Value = c.Element("Name").Value
-                                          }).ToList()
-                    }).ToList();
-        }
-
-        private DecisionOutcomes LoadOutcomes(XElement root)
-        {
-            var outcomesElement = root.Element("Outcomes");
-            var vals = from o in outcomesElement.Descendants("Value")
-                       select new DecisionOutcome
-                       {
-                           Id = int.Parse(o.Element("Id").Value),
-                           Name = o.Element("Name").Value
-                       };
-            return new DecisionOutcomes
-            {
-                OutcomeType = outcomesElement.Element("Type").Value,
-                OutcomeColumnNameInSampleData = outcomesElement.Element("Column").Value,
-                Values = vals.ToList()
-            };
-        }
-
-        #endregion Configuration Loading
 
         public DecisionTree CreateTree()
         {
@@ -153,11 +116,6 @@ namespace DecisionDiagrams
         {
             var col = attr.Name;
             return examples.Where(e => e.Field<string>(col) == cls.Value);
-        }
-
-        private SymbolTableEntry GetSymbolTableEntryFromAttribute(Attribute attr)
-        {
-            return SymbolTable.GetEntry(attr.Name);
         }
 
         private bool SamplesContainInstanceWithAttributeInClass(IEnumerable<DataRow> examples, Attribute attr, PossibleValue cls)

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace DecisionDiagrams
+namespace Modd
 {
     public class KNOCKOUT_Graph<TVertexType, TEdgeLabelType>
         where TVertexType : IEquatable<TVertexType>

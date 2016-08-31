@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DecisionDiagrams
+namespace Modd
 {
     [Serializable]
     public class DecisionException : ApplicationException

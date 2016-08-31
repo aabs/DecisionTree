@@ -1,4 +1,4 @@
-﻿using DecisionDiagrams;
+﻿using Modd;
 using FluentAssertions;
 using NUnit.Framework;
 using System;

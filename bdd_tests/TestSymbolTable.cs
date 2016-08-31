@@ -1,6 +1,6 @@
 ﻿using System;
 using NUnit.Framework;
-using DecisionDiagrams;
+using Modd;
 using FluentAssertions;
 
 namespace bdd_tests

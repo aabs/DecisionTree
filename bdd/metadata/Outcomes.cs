@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace DecisionDiagrams
+namespace Modd.Metadata
 {
 
     public class DecisionOutcomes
