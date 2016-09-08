@@ -109,37 +109,24 @@ namespace bdd_tests
             var initialVertexCount = vertexCounter.Counter;
             Debug.WriteLine($"Vertices: {initialVertexCount}");
 
-            // now normalise the tree
-            var normaliser = new NormaliserSimplifier(dt.Tree, "Unmatched");
-            normaliser.Visit(dt.Tree.Root());
-
-            // now count them again. (should be larger)
-            vertexCounter.Reset();
-            vertexCounter.Visit(dt.Tree.Root());
-            var normalisedVertexCount = vertexCounter.Counter;
-            Debug.WriteLine($"Vertices: {normalisedVertexCount}");
-            normalisedVertexCount.Should().Equals(initialVertexCount);
-
             // now start to simplify
-            //var evaluator = new BryantReducer(dt);
-            //evaluator.Visit(dt.Tree.Root());
-            //var dt2 = new DecisionTree<BaseDtVertexType, DtBranchTest>
-            //{
-            //    Tree = new Graph<BaseDtVertexType, DtBranchTest>
-            //    {
-            //        Root = evaluator.SimplifiedTree
-            //    }
-            //};
+            var reducer = new Reducer();
+            var reducedTree = reducer.Reduce(sut.SymbolTable,  dt.Tree);
+
+            var dt2 = new DecisionTree<BaseDtVertexType, DtBranchTest>
+            {
+                Tree = reducedTree
+            };
 
             //// now count vertices in the simplified tree
-            //vertexCounter.Reset();
-            //vertexCounter.Visit(dt2.Tree.Root);
-            //var simplifiedVertexCount = vertexCounter.Counter;
-            //Debug.WriteLine($"Vertices: {simplifiedVertexCount}");
-            //simplifiedVertexCount.Should().BeLessThan(normalisedVertexCount);
+            vertexCounter.Reset();
+            vertexCounter.Visit(dt2.Tree.Root());
+            var simplifiedVertexCount = vertexCounter.Counter;
+            Debug.WriteLine($"Vertices: {simplifiedVertexCount}");
+            simplifiedVertexCount.Should().BeLessThan(initialVertexCount);
 
             // check that the modified DT still works OK.
-            //EvaluatesAllTestDataCorrectly(sut, dt2);
+            EvaluatesAllTestDataCorrectly(sut, dt2.Tree);
         }
 
     }

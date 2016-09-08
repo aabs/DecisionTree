@@ -33,5 +33,10 @@ namespace Modd
         {
             return (T)(GetAnnotation(source));
         }
+        internal bool HasAnnotation(string source)
+        {
+            return annotations.ContainsKey(source);
+        }
+
     }
 }

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Modd
+﻿namespace Modd
 {
     public abstract class BaseDtVertexType : Annotatable
     {
