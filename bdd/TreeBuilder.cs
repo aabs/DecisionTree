@@ -12,24 +12,18 @@ namespace Modd
     using Metadata;
     using QuickGraph;
     using DecisionTree = DecisionTree<BaseDtVertexType, DtBranchTest>;
-
-    public class GraphType : AdjacencyGraph<BaseDtVertexType, TaggedEdge<BaseDtVertexType, DtBranchTest>>
+    using GraphType = QuickGraph.AdjacencyGraph<BaseDtVertexType, QuickGraph.TaggedEdge<BaseDtVertexType, DtBranchTest>>;
+    public class DecisionTreeBuilder
     {
-        public BaseDtVertexType Root
-        {
-            get { return this.Vertices.First(); }
-        }
-
-    }
-    public class TreeBuilder
-    {
-        public TreeBuilder(string metadataFileLocation)
+        public DecisionTreeBuilder(string metadataFileLocation, string defaultOutcome)
         {
             var doc = XDocument.Load(metadataFileLocation);
             this.SymbolTable = LoadConfig(doc.Document.Root);
+            this.DefaultOutcome = defaultOutcome;
         }
 
         public SymbolTable SymbolTable { get; private set; }
+        public string DefaultOutcome { get; private set; }
 
         private SymbolTable LoadConfig(XElement root)
         {
@@ -53,63 +47,86 @@ namespace Modd
             }
             return result;
         }
-
         public DecisionTree CreateTree()
         {
             var csvString = File.ReadAllText(SymbolTable.DecisionMetadata.SampleDataLocation);
             var data = CsvParser.Parse(csvString, new CsvSettings { FieldDelimiter = ',', RowDelimiter = "\n" });
             var samples = ConvertSampleDataToDataSet(data).Tables["Samples"].AsEnumerable();
             SymbolTable.DecisionMetadata.AllSamples = samples;
-            var g = new GraphType();
-            CreateTree(g,
+            var stb = new SimpleTreeBuilder();
+            CreateTree(stb,
                 samples,
-                SymbolTable.DecisionMetadata.Attributes);
-            var dt = new DecisionTree<BaseDtVertexType, DtBranchTest>
-            {
-                Tree = g
-            };
-            return dt;
+                SymbolTable.DecisionMetadata.Attributes,
+                null);
+            return stb.Build();
         }
 
-        public BaseDtVertexType CreateTree(GraphType g,
-            IEnumerable<DataRow> examples,
-            IEnumerable<Attribute> attributes)
+        public void CreateTree(SimpleTreeBuilder tb,
+            IEnumerable<DataRow> samples,
+            IEnumerable<Attribute> attributes,
+            string label)
         {
-            // 0. if all samples have same outcome create terminal node with that outcome
-            foreach (var o in SymbolTable.DecisionMetadata.Outcomes.Values)
-            {
-                if (AllSamplesHaveSameOutcome(examples, o))
-                {
-                    var x = new DtOutcome(o.Name);
-                    g.AddVertex(x);
-                    return x;
-                }
-            }
-            // if we get to here, data must be variegated...
+            Attribute attr = null;
+            bool isCreatingRootVertex = (tb.IsEmpty || string.IsNullOrWhiteSpace(label));
 
-            // 1. find the best attribute to classify sample data
-            var attr = GetDominatingAttribute(examples, attributes);
-            var result = new DtTest(attr);
-            g.AddVertex(result);
-            // 2. for each class under that attribute
-            foreach (PossibleValue cls in attr.PossibleValues)
+            if (tb.CurrentVertex != null && tb.CurrentVertex is DtOutcome)
             {
-                // 2.1. if samples contain instances with that value of the attribute,
-                if (SamplesContainInstanceWithAttributeInClass(examples, attr, cls))
+                throw new DecisionException("Shouldn't try to recurse further after terminating on a leaf node");
+            }
+
+            if (attributes.Count() < 1)
+            {
+                // if there are no more attributes, exploration further is impossible
+                //throw new DecisionException("Malformed decision model. No attributes defined.");
+                return;
+            }
+
+            attr = GetDominatingAttribute(samples, attributes);
+            try
+            {
+                // if tree is empty?
+                if (isCreatingRootVertex)
                 {
-                    // 2.1.1 then create a node for that outcome
-                    //       with the list filtered to that outcome
-                    var filteredExamples = FilterExamplesToSubclassOfAttribute(examples, attr, cls);
-                    //       with the attribute list filtered to remove the attribute
-                    var filteredAttributes = attributes.Except(new[] { attr });
-                    var edgeLabel = new AttributePermissibleValue { ClassName = cls.Value, Value = cls.Value };
-                    var targetVertex = CreateTree(g, filteredExamples, filteredAttributes);
-                    var branch = new DtBranchTest(edgeLabel);
-                    var edge = new TaggedEdge<BaseDtVertexType, DtBranchTest>(result, targetVertex, branch);
-                    g.AddEdge(edge);
+                    tb.WithRoot(new DtTest(attr));
+                    // PROBLEM: Only the first child edge of the root is being explored. Why?
+                }
+                else
+                {
+                    // check here whether the samples all contain the same outcome. if so create an outcome and return
+                    foreach (var outcome in SymbolTable.DecisionMetadata.Outcomes.Values)
+                    {
+                        if (AllSamplesHaveSameOutcome(samples, outcome))
+                        {
+                            tb.StartChild(new DtOutcome(outcome.Name), label);
+                            return;
+                        }
+                    }
+                    tb.StartChild(new DtTest(attr), label);
+                }
+
+                //   for pv in possible values
+                foreach (var pv in attr.PossibleValues)
+                {
+                    if (SamplesContainInstanceWithAttributeInClass(samples, attr, pv))
+                    {
+                        //     filter examples for matches with pv
+                        var filteredSamples = FilterExamplesToSubclassOfAttribute(samples, attr, pv);
+                        //     filter dominating attribute out of set of attrs
+                        var filteredAttributes = attributes.Except(new[] { attr });
+                        //     recurse with label <- pv
+                        CreateTree(tb, filteredSamples, filteredAttributes, pv.Value);
+                        // PROBLEM: By the time we get here, the currentvertex has changed. Why?
+                    }
+                    else
+                    {
+                        tb.StartChild(new DtOutcome(this.DefaultOutcome), pv.Value).EndChild();
+                    }
                 }
             }
-            return result;
+            finally
+            {
+                tb.EndChild();
+            }
         }
 
         private IEnumerable<DataRow> FilterExamplesToSubclassOfAttribute(IEnumerable<DataRow> examples, Attribute attr, PossibleValue cls)
@@ -219,3 +236,5 @@ namespace Modd
         }
     }
 }
+
+

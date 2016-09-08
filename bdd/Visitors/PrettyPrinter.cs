@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace Modd
 {
-    using DT = GraphType;
+    using GraphType = QuickGraph.AdjacencyGraph<BaseDtVertexType, QuickGraph.TaggedEdge<BaseDtVertexType, DtBranchTest>>;
     public class PrettyPrinter : VisitorSupertype
     {
-        public PrettyPrinter(DT dt) : base(dt)
+        public PrettyPrinter(GraphType dt) : base(dt)
         {
         }
     }

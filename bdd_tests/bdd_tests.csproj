@@ -79,12 +79,13 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
+    <Compile Include="SimpletreeBuilderTest.cs" />
     <Compile Include="TestDecisionTree.cs" />
     <Compile Include="TestEnvironment.cs" />
     <Compile Include="TestMetadata.cs" />
     <Compile Include="TestSymbolTable.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TestDecisionTreeOptimiser.cs" />
+    <Compile Include="TestOptimisation.cs" />
     <Compile Include="TestTreeBuilder.cs" />
     <Compile Include="TreeTests.cs" />
   </ItemGroup>

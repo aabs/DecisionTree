@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 
 namespace Modd
 {
+    using GraphType = QuickGraph.AdjacencyGraph<BaseDtVertexType, QuickGraph.TaggedEdge<BaseDtVertexType, DtBranchTest>>;
+
     public interface IVisitor<TNodeType, TTestType>
     {
         void Visit(TaggedEdge<TNodeType, TTestType> n);

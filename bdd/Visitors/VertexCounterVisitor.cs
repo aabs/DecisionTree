@@ -1,5 +1,6 @@
 ﻿namespace Modd
 {
+    using GraphType = QuickGraph.AdjacencyGraph<BaseDtVertexType, QuickGraph.TaggedEdge<BaseDtVertexType, DtBranchTest>>;
     public class VertexCounterVisitor : VisitorSupertype
     {
         private int counter = 0;

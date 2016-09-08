@@ -1,1 +1,1 @@
-<Playlist Version="1.0"><Add Test="bdd_tests.TestTreeBuilder.CanVisitTree" /><Add Test="bdd_tests.TestTreeBuilder.CanReduceTreeWithoutChangingFunctionComputed" /></Playlist>
+<Playlist Version="1.0"><Add Test="bdd_tests.TestTreeBuilder.CanVisitTree" /><Add Test="bdd_tests.TestTreeBuilder.CanReduceTreeWithoutChangingFunctionComputed" /><Add Test="bdd_tests.TestOptimisation.CanConstructDecisionMetadaatUsingWithColumn" /><Add Test="bdd_tests.TestTreeBuilder.CanRunTreeBuilder" /><Add Test="bdd_tests.TestTreeBuilder.CanSimplifyTree" /></Playlist>

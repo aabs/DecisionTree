@@ -2,7 +2,7 @@
 
 namespace Modd
 {
-    using DT = GraphType;
+    using DT = QuickGraph.AdjacencyGraph<BaseDtVertexType, QuickGraph.TaggedEdge<BaseDtVertexType, DtBranchTest>>;
     using TE = TaggedEdge<BaseDtVertexType, DtBranchTest>;
 
     public class EvaluatorVisitor : VisitorSupertype
@@ -42,7 +42,8 @@ namespace Modd
             {
                 var x = v as DtTest;
                 var testValue = Environment.Resolve(x.Attribute);
-                foreach (var c in g.OutEdges(v))
+                var children = g.OutEdges(v);
+                foreach (var c in children)
                 {
                     var lblVal = c.Tag.TestValue.Value;
                     if (testValue == (string)lblVal)

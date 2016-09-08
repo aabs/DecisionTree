@@ -7,9 +7,11 @@ using System.Diagnostics;
 using System;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Modd.Metadata;
 
 namespace bdd_tests
 {
+    using GraphType = QuickGraph.AdjacencyGraph<BaseDtVertexType, QuickGraph.TaggedEdge<BaseDtVertexType, DtBranchTest>>;
     [TestFixture]
     public class TestTreeBuilder
     {
@@ -17,7 +19,7 @@ namespace bdd_tests
         [Test]
         public void CanCreateTreeBuilder()
         {
-            var sut = new TreeBuilder(GetMetadataPath());
+            var sut = new DecisionTreeBuilder(GetMetadataPath(), "ignore");
             sut.Should().NotBeNull();
         }
 
@@ -29,20 +31,20 @@ namespace bdd_tests
         [Test]
         public void CanRunTreeBuilder()
         {
-            var sut = new TreeBuilder(GetMetadataPath());
+            var sut = new DecisionTreeBuilder(GetMetadataPath(), "ignore");
             var dt = sut.CreateTree();
         }
 
         [Test]
         public void CanEvaluateTree()
         {
-            var sut = new TreeBuilder(GetMetadataPath());
+            var sut = new DecisionTreeBuilder(GetMetadataPath(), "ignore");
             var dt = sut.CreateTree();
 
-            EvaluatesAllTestDataCorrectly(sut, (Modd.GraphType)dt.Tree);
+            EvaluatesAllTestDataCorrectly(sut, (GraphType)dt.Tree);
         }
 
-        private void EvaluatesAllTestDataCorrectly(TreeBuilder sut, GraphType g)
+        private void EvaluatesAllTestDataCorrectly(DecisionTreeBuilder sut, GraphType g)
         {
             int correct = 0, total = 0;
 
@@ -84,10 +86,10 @@ namespace bdd_tests
         [Test]
         public void CanReduceTreeWithoutChangingFunctionComputed()
         {
-            var treeBuilder = new TreeBuilder(GetMetadataPath());
+            var treeBuilder = new DecisionTreeBuilder(GetMetadataPath(), "Unmatched");
             var decisionTree = treeBuilder.CreateTree();
-            var normaliser = new NormaliserSimplifier(decisionTree.Tree, "Unmatched");
-            normaliser.Visit(decisionTree.Tree.Root);
+            //var normaliser = new NormaliserSimplifier(decisionTree.Tree, "Unmatched");
+            //normaliser.Visit(decisionTree.Tree.Root());
             var sut = new Reducer();
             EvaluatesAllTestDataCorrectly(treeBuilder, decisionTree.Tree);
             var g = sut.Reduce(treeBuilder.SymbolTable, decisionTree.Tree);
@@ -97,30 +99,30 @@ namespace bdd_tests
         [Test]
         public void CanSimplifyTree()
         {
-            var sut = new TreeBuilder(GetMetadataPath());
+            var sut = new DecisionTreeBuilder(GetMetadataPath(), "Unmatched");
             var dt = sut.CreateTree();
             EvaluatesAllTestDataCorrectly(sut, dt.Tree);
 
             // first count the number of vertices
             var vertexCounter = new VertexCounterVisitor(dt.Tree);
-            vertexCounter.Visit(dt.Tree.Root);
+            vertexCounter.Visit(dt.Tree.Root());
             var initialVertexCount = vertexCounter.Counter;
             Debug.WriteLine($"Vertices: {initialVertexCount}");
 
             // now normalise the tree
             var normaliser = new NormaliserSimplifier(dt.Tree, "Unmatched");
-            normaliser.Visit(dt.Tree.Root);
+            normaliser.Visit(dt.Tree.Root());
 
             // now count them again. (should be larger)
             vertexCounter.Reset();
-            vertexCounter.Visit(dt.Tree.Root);
+            vertexCounter.Visit(dt.Tree.Root());
             var normalisedVertexCount = vertexCounter.Counter;
             Debug.WriteLine($"Vertices: {normalisedVertexCount}");
-            normalisedVertexCount.Should().BeGreaterThan(initialVertexCount);
-            
+            normalisedVertexCount.Should().Equals(initialVertexCount);
+
             // now start to simplify
             //var evaluator = new BryantReducer(dt);
-            //evaluator.Visit(dt.Tree.Root);
+            //evaluator.Visit(dt.Tree.Root());
             //var dt2 = new DecisionTree<BaseDtVertexType, DtBranchTest>
             //{
             //    Tree = new Graph<BaseDtVertexType, DtBranchTest>
@@ -141,4 +143,5 @@ namespace bdd_tests
         }
 
     }
+
 }

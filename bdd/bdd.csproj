@@ -61,7 +61,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GraphType.cs" />
     <Compile Include="Metadata\MetadataBuilder.cs" />
+    <Compile Include="SimpleTreeBuilder.cs" />
     <Compile Include="tree\BaseDtVertexType.cs" />
     <Compile Include="tree\DtBranchTest.cs" />
     <Compile Include="tree\DtOutcome.cs" />

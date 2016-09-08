@@ -10,6 +10,7 @@ using Modd.Metadata;
 
 namespace Modd
 {
+    using GraphType = QuickGraph.AdjacencyGraph<BaseDtVertexType, QuickGraph.TaggedEdge<BaseDtVertexType, DtBranchTest>>;
     public class Reducer
     {
         Dictionary<string, string> labels = new Dictionary<string, string>();

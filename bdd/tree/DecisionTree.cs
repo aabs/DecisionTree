@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace Modd
 {
+    using GraphType = QuickGraph.AdjacencyGraph<BaseDtVertexType, QuickGraph.TaggedEdge<BaseDtVertexType, DtBranchTest>>;
     public class DecisionTree<TNodeType, TTestType>
     {
         public GraphType Tree { get; set; }

@@ -8,6 +8,7 @@ namespace Modd
 {
     using QuickGraph;
     using DT = DecisionTree<BaseDtVertexType, DtBranchTest>;
+    using GraphType = QuickGraph.AdjacencyGraph<BaseDtVertexType, QuickGraph.TaggedEdge<BaseDtVertexType, DtBranchTest>>;
 
     public class NormaliserSimplifier : VisitorSupertype
     {
@@ -42,7 +43,9 @@ namespace Modd
                 {
                     // if none of the children of this vertex has a label corresponding to the
                     // data class dc, then create a default outcome
-                    if (!g.OutEdges(v).Any(te => dc.Value == (string)te.Tag.TestValue.Value))
+
+                    var children = g.OutEdges(v);
+                    if (!children.Any(te => dc.Value == (string)te.Tag.TestValue.Value))
                     {
                         var newTag = new DtBranchTest(new AttributePermissibleValue { ClassName = dc.Value, Value = dc.Value });
                         var newLeaf = new DtOutcome(DefaultOutcome);

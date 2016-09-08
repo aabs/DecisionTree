@@ -51,6 +51,22 @@ namespace DecisionDiagram.Metadata
         }
 
 
+        public MetadataBuilder WithColumn(int columnIndex, string heading, params string[] values)
+        {
+            StartColumn(columnIndex, heading);
+            foreach (var v in values)
+            {
+                DetectValue(v);
+            }
+            EndColumn();
+            return this;
+        }
+
+        public MetadataBuilder IgnoringField(string columnHeading)
+        {
+            throw new NotImplementedException();
+        }
+
         public MetadataBuilder WithFieldDelimiter(char delimiter)
         {
             this.delimiter = delimiter;
@@ -76,14 +92,13 @@ namespace DecisionDiagram.Metadata
                 Attributes = (from c in columns
                               where !c.IsOutcomeColumn
                               select new Modd.Metadata.Attribute
-                              {
-                                  KindOfData = "Enumerated",
-                                  Name = c.Heading,
-                                  PossibleValues = c.Values
+                              (
+                                  name: c.Heading,
+                                  vals: c.Values
                                   .OrderBy(v => v)
-                                  .Select(v=>new PossibleValue { Value = v})
-                                  .ToList()
-                              }).ToList(),
+                                  .Select(v=>v)
+                                  .ToArray()
+                              )).ToList(),
                 Outcomes = new DecisionOutcomes
                 {
                     OutcomeColumnNameInSampleData = outcomes.Heading,
