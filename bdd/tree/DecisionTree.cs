@@ -10,6 +10,7 @@ namespace Modd
     using GraphType = QuickGraph.AdjacencyGraph<BaseDtVertexType, QuickGraph.TaggedEdge<BaseDtVertexType, DtBranchTest>>;
     public class DecisionTree<TNodeType, TTestType>
     {
+        public SymbolTable SymbolTable { get; internal set; }
         public GraphType Tree { get; set; }
     }
 }

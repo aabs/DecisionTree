@@ -1,13 +1,12 @@
 ﻿using QuickGraph;
 using QuickGraph.Algorithms.Search;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace Modd
 {
-    using GraphType = QuickGraph.AdjacencyGraph<BaseDtVertexType, QuickGraph.TaggedEdge<BaseDtVertexType, DtBranchTest>>;
     using EdgeType = QuickGraph.TaggedEdge<BaseDtVertexType, DtBranchTest>;
+    using GraphType = QuickGraph.AdjacencyGraph<BaseDtVertexType, QuickGraph.TaggedEdge<BaseDtVertexType, DtBranchTest>>;
 
     public class Reducer
     {
@@ -136,7 +135,7 @@ namespace Modd
         ///            +-----+ X |
         ///                  +---+
         /// </example>
-        void CollapseTautologicalTestBranch(BaseDtVertexType vertex)
+        private void CollapseTautologicalTestBranch(BaseDtVertexType vertex)
         {
             var children = graph.OutEdges(vertex);
 
@@ -156,6 +155,7 @@ namespace Modd
             // now relabel the parent of the vertex.
             graph.Parents(preferredVertex).Foreach(v => ComputeVertexLabel(v));
         }
+
         public void ReplaceRedundantVertexWithCanonicalInstance(GraphType self, BaseDtVertexType v_old, BaseDtVertexType v_new)
         {
             if (v_new == null)
@@ -168,7 +168,6 @@ namespace Modd
                 self.AddVertex(v_new);
             }
 
-
             // redirect InEdges to the new vertex
             var in_edges = self.InEdges(v_old).ToList();
             self.AddEdgeRange(in_edges.Select(e => new EdgeType(e.Source, v_new, e.Tag)));
@@ -177,7 +176,7 @@ namespace Modd
             // if the vertex is an outcome it won't have any children so there's no need to prune its children
             if (v_old is DtOutcome) return;
 
-            // now dispose of any unwanted children, taking into account that the new 
+            // now dispose of any unwanted children, taking into account that the new
             // vertex may be one of the children, and thus should be kept.
             var unwanted_children = self.OutEdges(v_old)
                 .ToList();

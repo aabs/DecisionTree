@@ -1,26 +1,23 @@
-﻿
+﻿using FluentAssertions;
 using Modd;
-using FluentAssertions;
 using NUnit.Framework;
 using System.Data;
 using System.Diagnostics;
-using System;
 using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Modd.Metadata;
 
 namespace bdd_tests
 {
+    using Modd.visitors;
     using System.Text;
     using GraphType = QuickGraph.AdjacencyGraph<BaseDtVertexType, QuickGraph.TaggedEdge<BaseDtVertexType, DtBranchTest>>;
+
     [TestFixture]
     public class TestTreeBuilder
     {
-
         [Test]
         public void CanCreateTreeBuilder()
         {
-            var sut = new DecisionTreeBuilder(GetMetadataPath(), "ignore");
+            var sut = new DecisionTreeBuilder(GetMetadataPath());
             sut.Should().NotBeNull();
         }
 
@@ -32,14 +29,14 @@ namespace bdd_tests
         [Test]
         public void CanRunTreeBuilder()
         {
-            var sut = new DecisionTreeBuilder(GetMetadataPath(), "ignore");
+            var sut = new DecisionTreeBuilder(GetMetadataPath());
             var dt = sut.CreateTree();
         }
 
         [Test]
         public void CanEvaluateTree()
         {
-            var sut = new DecisionTreeBuilder(GetMetadataPath(), "ignore");
+            var sut = new DecisionTreeBuilder(GetMetadataPath());
             var dt = sut.CreateTree();
 
             EvaluatesAllTestDataCorrectly(sut, (GraphType)dt.Tree);
@@ -87,7 +84,7 @@ namespace bdd_tests
         [Test]
         public void CanReduceTreeWithoutChangingFunctionComputed()
         {
-            var treeBuilder = new DecisionTreeBuilder(GetMetadataPath(), "Unmatched");
+            var treeBuilder = new DecisionTreeBuilder(GetMetadataPath());
             var decisionTree = treeBuilder.CreateTree();
             //var normaliser = new NormaliserSimplifier(decisionTree.Tree, "Unmatched");
             //normaliser.Visit(decisionTree.Tree.Root());
@@ -98,9 +95,25 @@ namespace bdd_tests
         }
 
         [Test]
+        public void CanGenerateSource()
+        {
+            var sut = new DecisionTreeBuilder(GetMetadataPath());
+            var dt = sut.CreateReducedTree();
+            var gen = new CSharpCodeGenerator();
+            var src = gen.GenerateSource(new MetadataConfiguration
+            {
+                SampleDataLocation = @"C:\dev\binarydecisiontree\bdd_tests\testdata\usm.mbrmatch.trainingdata.csv",
+                OutcomeColumn = "Status",
+                DefaultOutcome = "Unmatched",
+                ColumnsToIgnore = new[] { "Status" }
+            });
+            Debug.WriteLine(src);
+        }
+
+        [Test]
         public void CanSimplifyTree()
         {
-            var sut = new DecisionTreeBuilder(GetMetadataPath(), "Unmatched");
+            var sut = new DecisionTreeBuilder(GetMetadataPath());
             var dt = sut.CreateTree();
             EvaluatesAllTestDataCorrectly(sut, dt.Tree);
 
@@ -111,8 +124,8 @@ namespace bdd_tests
             Debug.WriteLine($"Vertices: {initialVertexCount}");
 
             // now start to simplify
-            var reducer = new Reducer((GraphType g)=> { this.QuietTestDataEvaluator(sut, g); });
-            var reducedTree = reducer.Reduce(sut.SymbolTable,  dt.Tree);
+            var reducer = new Reducer((GraphType g) => { this.QuietTestDataEvaluator(sut, g); });
+            var reducedTree = reducer.Reduce(sut.SymbolTable, dt.Tree);
 
             var dt2 = new DecisionTree<BaseDtVertexType, DtBranchTest>
             {
@@ -129,6 +142,7 @@ namespace bdd_tests
             // check that the modified DT still works OK.
             EvaluatesAllTestDataCorrectly(sut, dt2.Tree);
         }
+
         private void QuietTestDataEvaluator(DecisionTreeBuilder sut, GraphType g)
         {
             foreach (DataRow row in sut.SymbolTable.DecisionMetadata.AllSamples)
@@ -150,7 +164,5 @@ namespace bdd_tests
                 }
             }
         }
-
     }
-
 }

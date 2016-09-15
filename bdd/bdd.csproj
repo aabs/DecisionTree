@@ -62,6 +62,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Constants.cs" />
+    <Compile Include="MetadataConfiguration.cs" />
     <Compile Include="tree\GraphType.cs" />
     <Compile Include="Metadata\MetadataBuilder.cs" />
     <Compile Include="SimpleTreeBuilder.cs" />
@@ -76,6 +77,7 @@
     <Compile Include="Metadata\Outcome.cs" />
     <Compile Include="Metadata\Outcomes.cs" />
     <Compile Include="tree\Annotatable.cs" />
+    <Compile Include="visitors\CSharpCodeGenerator.cs" />
     <Compile Include="visitors\EvaluatorVisitor.cs" />
     <Compile Include="runtime\Environment.cs" />
     <Compile Include="Exceptions.cs" />

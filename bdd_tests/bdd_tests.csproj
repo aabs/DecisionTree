@@ -81,6 +81,7 @@
   <ItemGroup>
     <Compile Include="SimpletreeBuilderTest.cs" />
     <Compile Include="TestAnnotation.cs" />
+    <None Include="testdata\example.cs" />
     <Compile Include="TestDecisionTree.cs" />
     <Compile Include="TestEnvironment.cs" />
     <Compile Include="TestMetadata.cs" />

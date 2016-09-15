@@ -10,27 +10,47 @@ namespace Modd
 {
     using DecisionDiagram.Metadata;
     using Metadata;
-    using QuickGraph;
     using DecisionTree = DecisionTree<BaseDtVertexType, DtBranchTest>;
-    using GraphType = QuickGraph.AdjacencyGraph<BaseDtVertexType, QuickGraph.TaggedEdge<BaseDtVertexType, DtBranchTest>>;
+
     public class DecisionTreeBuilder
     {
-        public DecisionTreeBuilder(string metadataFileLocation, string defaultOutcome)
+        public MetadataConfiguration Config { get; set; }
+
+        public DecisionTreeBuilder(MetadataConfiguration config)
+        {
+            Config = config;
+            this.SymbolTable = LoadConfig();
+            this.DefaultOutcome = config.DefaultOutcome;
+        }
+
+        public DecisionTreeBuilder(string metadataFileLocation)
         {
             var doc = XDocument.Load(metadataFileLocation);
             this.SymbolTable = LoadConfig(doc.Document.Root);
-            this.DefaultOutcome = defaultOutcome;
+            this.DefaultOutcome = doc.Document.Root.Element("DefaultOutcome").Value;
         }
 
         public SymbolTable SymbolTable { get; private set; }
         public string DefaultOutcome { get; private set; }
 
-        private SymbolTable LoadConfig(XElement root)
+        private SymbolTable LoadConfig()
         {
-            var mdb = new MetadataBuilder(root.Element("SampleData").Value)
-                .WithOutcomeColumn(root.Element("OutcomeColumn").Value);
+            var mdb = new MetadataBuilder(Config.SampleDataLocation)
+                .WithOutcomeColumn(Config.OutcomeColumn);
             var metadata = mdb.Build();
             return BuildSymbolTable(metadata);
+        }
+
+        private SymbolTable LoadConfig(XElement root)
+        {
+            Config = new MetadataConfiguration
+            {
+                ColumnsToIgnore = root.Element("Ignore").Descendants("Column").Select(x => x.Value),
+                DefaultOutcome = root.Element("DefaultOutcome").Value,
+                OutcomeColumn = root.Element("OutcomeColumn").Value,
+                SampleDataLocation = root.Element("SampleData").Value
+            };
+            return LoadConfig();
         }
 
         private SymbolTable BuildSymbolTable(DecisionMetadata d)
@@ -47,6 +67,21 @@ namespace Modd
             }
             return result;
         }
+
+        public DecisionTree CreateReducedTree()
+        {
+            var unoptimisedTree = CreateTree();
+            var reducer = new Reducer(null);
+            var optimisedTree = reducer.Reduce(SymbolTable, unoptimisedTree.Tree);
+
+            var result = new DecisionTree
+            {
+                Tree = optimisedTree,
+                SymbolTable = this.SymbolTable
+            };
+            return result;
+        }
+
         public DecisionTree CreateTree()
         {
             var csvString = File.ReadAllText(SymbolTable.DecisionMetadata.SampleDataLocation);
@@ -236,5 +271,3 @@ namespace Modd
         }
     }
 }
-
-
