@@ -11,6 +11,7 @@ using Modd.Metadata;
 
 namespace bdd_tests
 {
+    using System.Text;
     using GraphType = QuickGraph.AdjacencyGraph<BaseDtVertexType, QuickGraph.TaggedEdge<BaseDtVertexType, DtBranchTest>>;
     [TestFixture]
     public class TestTreeBuilder
@@ -90,7 +91,7 @@ namespace bdd_tests
             var decisionTree = treeBuilder.CreateTree();
             //var normaliser = new NormaliserSimplifier(decisionTree.Tree, "Unmatched");
             //normaliser.Visit(decisionTree.Tree.Root());
-            var sut = new Reducer();
+            var sut = new Reducer(null);
             EvaluatesAllTestDataCorrectly(treeBuilder, decisionTree.Tree);
             var g = sut.Reduce(treeBuilder.SymbolTable, decisionTree.Tree);
             EvaluatesAllTestDataCorrectly(treeBuilder, decisionTree.Tree);
@@ -110,7 +111,7 @@ namespace bdd_tests
             Debug.WriteLine($"Vertices: {initialVertexCount}");
 
             // now start to simplify
-            var reducer = new Reducer();
+            var reducer = new Reducer((GraphType g)=> { this.QuietTestDataEvaluator(sut, g); });
             var reducedTree = reducer.Reduce(sut.SymbolTable,  dt.Tree);
 
             var dt2 = new DecisionTree<BaseDtVertexType, DtBranchTest>
@@ -127,6 +128,27 @@ namespace bdd_tests
 
             // check that the modified DT still works OK.
             EvaluatesAllTestDataCorrectly(sut, dt2.Tree);
+        }
+        private void QuietTestDataEvaluator(DecisionTreeBuilder sut, GraphType g)
+        {
+            foreach (DataRow row in sut.SymbolTable.DecisionMetadata.AllSamples)
+            {
+                var environment = RowToEnv(sut.SymbolTable, row);
+                var evaluator = new EvaluatorVisitor(g, environment);
+                evaluator.Visit(g.Vertices.First());
+                if (!evaluator.EvaluatedResult.Equals(row["DecisionOutcome"]))
+                {
+                    StringBuilder sb = new StringBuilder();
+                    sb.Append($"Fail: (Eval: {evaluator.EvaluatedResult})\t");
+                    foreach (var c in row.Table.Columns)
+                    {
+                        var col = c as DataColumn;
+                        sb.Append($"{col.ColumnName}: {row[col.ColumnName]},\t");
+                    }
+                    sb.Append("\n");
+                    NUnit.Framework.Assert.Fail(sb.ToString());
+                }
+            }
         }
 
     }

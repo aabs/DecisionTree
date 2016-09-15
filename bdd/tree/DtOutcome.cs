@@ -6,7 +6,7 @@ namespace Modd
     [DebuggerDisplay("{ToDebuggerString()}")]
     public class DtOutcome : BaseDtVertexType
     {
-        public DtOutcome(string outcome)
+        public DtOutcome(string outcome) : base()
         {
             if (outcome == null)
             {

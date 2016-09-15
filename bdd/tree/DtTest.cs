@@ -7,7 +7,7 @@ namespace Modd
     [DebuggerDisplay("{ToDebuggerString()}")]
     public class DtTest : BaseDtVertexType
     {
-        public DtTest(Attribute attribute)
+        public DtTest(Attribute attribute) : base()
         {
             this.Attribute = attribute;
         }

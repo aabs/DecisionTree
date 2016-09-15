@@ -5,9 +5,9 @@ using System.Linq;
 namespace Modd.Metadata
 {
     [DebuggerDisplay("{ToDebuggerString()}")]
-    public class Attribute
+    public class Attribute : Identifiable
     {
-        public Attribute(string name, params string[] vals )
+        public Attribute(string name, params string[] vals ) : base()
         {
             if (vals == null || vals.Length < 1)
                 throw new System.ArgumentException(nameof(vals));

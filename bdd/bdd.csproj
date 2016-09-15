@@ -61,15 +61,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="GraphType.cs" />
+    <Compile Include="Constants.cs" />
+    <Compile Include="tree\GraphType.cs" />
     <Compile Include="Metadata\MetadataBuilder.cs" />
     <Compile Include="SimpleTreeBuilder.cs" />
     <Compile Include="tree\BaseDtVertexType.cs" />
     <Compile Include="tree\DtBranchTest.cs" />
     <Compile Include="tree\DtOutcome.cs" />
     <Compile Include="tree\DtTest.cs" />
-    <Compile Include="tree\Edge.cs" />
-    <Compile Include="tree\Graph.cs" />
     <Compile Include="tree\DecisionTree.cs" />
     <Compile Include="Metadata\PossibleValue.cs" />
     <Compile Include="Metadata\DecisionMetadata.cs" />
@@ -77,7 +76,6 @@
     <Compile Include="Metadata\Outcome.cs" />
     <Compile Include="Metadata\Outcomes.cs" />
     <Compile Include="tree\Annotatable.cs" />
-    <Compile Include="tree\Vertex.cs" />
     <Compile Include="visitors\EvaluatorVisitor.cs" />
     <Compile Include="runtime\Environment.cs" />
     <Compile Include="Exceptions.cs" />
@@ -88,6 +86,7 @@
     <Compile Include="TreeBuilder.cs" />
     <Compile Include="UtilityFunctions.cs" />
     <Compile Include="visitors\Reducer.cs" />
+    <Compile Include="visitors\RedundancyTracker.cs" />
     <Compile Include="visitors\VertexCounterVisitor.cs" />
     <Compile Include="visitors\Visitor.cs" />
   </ItemGroup>

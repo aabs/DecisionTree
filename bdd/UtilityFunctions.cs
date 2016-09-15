@@ -17,14 +17,17 @@ namespace Modd
                 .Replace('\t', '_');
         }
 
-        public static bool AllIdentical<T>(this IEnumerable<T> seq)
+        public static bool Same<T>(this IEnumerable<T> seq)
+            where T : IEquatable<T>
         {
-            // degenerate case
             if (seq.Count() < 2)
                 return true;
             var first = seq.First();
             return seq.Skip(1).All(x => x.Equals(first));
         }
+
+        public static bool AllIdentical<T>(this IEnumerable<T> seq)
+            where T : IEquatable<T> => seq.Same();
 
 
         public static void Foreach<X>(this IEnumerable<X> seq, Action<X> task)
@@ -34,5 +37,10 @@ namespace Modd
                 task(item);
             }
         }
+
+        public static string ReductionKey(this BaseDtVertexType self)
+            => self.GetAnnotation<string>(Constants.ReductionKey);
+        public static string ReductionLabel(this BaseDtVertexType self)
+            => self.GetAnnotation<string>(Constants.ReductionLabel);
     }
 }
