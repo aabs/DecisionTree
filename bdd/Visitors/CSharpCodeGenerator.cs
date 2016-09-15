@@ -1,20 +1,22 @@
 ﻿using System;
 using System.Linq;
 using System.Text;
-using QuickGraph;
-using QuickGraph.Algorithms.Search;
 
 namespace Modd.visitors
 {
     using DTType = DecisionTree<BaseDtVertexType, DtBranchTest>;
-    using GraphType = QuickGraph.AdjacencyGraph<BaseDtVertexType, QuickGraph.TaggedEdge<BaseDtVertexType, DtBranchTest>>;
     using EdgeType = QuickGraph.TaggedEdge<BaseDtVertexType, DtBranchTest>;
+    using GraphType = QuickGraph.AdjacencyGraph<BaseDtVertexType, QuickGraph.TaggedEdge<BaseDtVertexType, DtBranchTest>>;
+
     public class CSharpCodeGenerator
     {
+        public MetadataConfiguration Config { get; private set; }
+
         public string GenerateSource(MetadataConfiguration config)
         {
             if (config == null)
                 throw new ArgumentNullException(nameof(config));
+            this.Config = config;
             var builder = new DecisionTreeBuilder(config);
             var dt = builder.CreateReducedTree();
             var sb = new StringBuilder();
@@ -36,7 +38,7 @@ namespace Modd.visitors
             sb.Append("} // end function\n");
         }
 
-        private void GenerateFunctionExpression(StringBuilder sb, 
+        private void GenerateFunctionExpression(StringBuilder sb,
             DecisionTree<BaseDtVertexType, DtBranchTest> dt)
         {
             GenerateVertexExpression(sb, dt.Tree.Root(), dt.Tree);
@@ -88,9 +90,10 @@ namespace Modd.visitors
         {
             var attrs = dt.SymbolTable.DecisionMetadata.Attributes.Select(a => "string " + CreateVarName(a.Name));
             var args = string.Join(", ", attrs.ToArray());
-            sb.AppendFormat("\nstring DoIt({0})\n{{\n", args);
+            sb.AppendFormat("\nstring {1}({0})\n{{\n", args, Config.FunctionName ?? "ShouldAccept");
         }
-        string CreateVarName(string name)
+
+        private string CreateVarName(string name)
         {
             var invalidChars = name.Where(c => !Char.IsLetterOrDigit(c)).Distinct();
             var result = name;
@@ -98,18 +101,20 @@ namespace Modd.visitors
             {
                 result = result.Replace(c, '_');
             }
-            return "_"+result.ToLowerInvariant();
+            return "_" + result.ToLowerInvariant();
         }
+
         private void GenerateModuleHeader(StringBuilder sb, DTType dt)
         {
-            sb.Append(@"
+            sb.AppendFormat(@"
 using System;
 using Modd;
 
-namespace Some.Namespace
-{ 
-    class SomeClass {
-");
+namespace {0} {{
+    class {1} {{
+", Config.Namespace ?? "Some.Namespace",
+Config.ClassName ?? "SomeClass"
+);
         }
     }
 }

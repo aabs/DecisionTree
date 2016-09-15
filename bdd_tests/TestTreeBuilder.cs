@@ -105,7 +105,10 @@ namespace bdd_tests
                 SampleDataLocation = @"C:\dev\binarydecisiontree\bdd_tests\testdata\usm.mbrmatch.trainingdata.csv",
                 OutcomeColumn = "Status",
                 DefaultOutcome = "Unmatched",
-                ColumnsToIgnore = new[] { "Status" }
+                ColumnsToIgnore = new[] { "Status" },
+                ClassName = "MemberMatcher",
+                FunctionName = "ShouldAcceptMember",
+                Namespace = "unisuper"
             });
             Debug.WriteLine(src);
         }

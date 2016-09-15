@@ -2,12 +2,12 @@
 using System;
 using Modd;
 
-namespace Some.Namespace
+namespace unisuper
 {
-    class SomeClass
+    class MemberMatcher
     {
 
-        string DoIt(string _tfn, string _member_number, string _surname, string _dob, string _1st_character_of_given_name, string _payroll_number, string _data_source)
+        string ShouldAcceptMember(string _tfn, string _member_number, string _surname, string _dob, string _1st_character_of_given_name, string _payroll_number, string _data_source)
         {
             if (_member_number == "Correct")
             {
